@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Poly Academy - Banner Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+font-family:Arial, sans-serif;
+background:#f4f8ff;
+margin:0;
+padding:20px;
+}
+
+h2{
+text-align:center;
+color:#0d47a1;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:15px;
+box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+input{
+width:100%;
+padding:12px;
+margin:10px 0;
+border:1px solid #ddd;
+border-radius:8px;
+}
+
+button{
+padding:10px 15px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.add-btn{
+background:#1565c0;
+color:white;
+}
+
+.active-btn{
+background:green;
+color:white;
+}
+
+.delete-btn{
+background:red;
+color:white;
+}
+
+.banner-card{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin:15px 0;
+padding:15px;
+border-radius:10px;
+background:#eef4ff;
+}
+
+.banner-card img{
+width:200px;
+height:100px;
+object-fit:cover;
+border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Banner Management Panel</h2>
+
+<div class="container">
+
+<input type="text" id="imageUrl" placeholder="Banner Image URL">
+<input type="text" id="link" placeholder="Redirect Link (Optional)">
+<button class="add-btn" onclick="addBanner()">Add Banner</button>
+
+<hr>
+
+<div id="bannerList"></div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+    authDomain: "hpresult-612a4.firebaseapp.com",
+    databaseURL: "https://hpresult-612a4-default-rtdb.firebaseio.com",
+    projectId: "hpresult-612a4",
+    storageBucket: "hpresult-612a4.appspot.com",
+    messagingSenderId: "938318154272",
+    appId: "1:938318154272:web:f55d536591e673b03d8a45"
+  };
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+const bannerList=document.getElementById("bannerList");
+
+async function loadBanners(){
+bannerList.innerHTML="";
+const snapshot=await getDocs(collection(db,"banners"));
+
+snapshot.forEach(d=>{
+const b=d.data();
+
+bannerList.innerHTML+=`
+<div class="banner-card">
+<div>
+<img src="${b.imageUrl}">
+<p>Status: ${b.isActive ? "Active" : "Inactive"}</p>
+</div>
+<div>
+<button class="active-btn" onclick="toggleActive('${d.id}',${b.isActive})">
+${b.isActive ? "Deactivate" : "Activate"}
+</button>
+<button class="delete-btn" onclick="deleteBanner('${d.id}')">
+Delete
+</button>
+</div>
+</div>
+`;
+});
+}
+
+window.addBanner=async function(){
+const imageUrl=document.getElementById("imageUrl").value;
+const link=document.getElementById("link").value;
+
+if(!imageUrl){
+alert("Image URL required");
+return;
+}
+
+await addDoc(collection(db,"banners"),{
+imageUrl:imageUrl,
+link:link,
+isActive:true,
+createdAt:Date.now()
+});
+
+document.getElementById("imageUrl").value="";
+document.getElementById("link").value="";
+
+loadBanners();
+}
+
+window.toggleActive=async function(id,currentStatus){
+await updateDoc(doc(db,"banners",id),{
+isActive:!currentStatus
+});
+loadBanners();
+}
+
+window.deleteBanner=async function(id){
+if(confirm("Delete this banner?")){
+await deleteDoc(doc(db,"banners",id));
+loadBanners();
+}
+}
+
+loadBanners();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin – D.Pharm Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  font-family: 'Segoe UI', sans-serif;
+  background:#f1f5f9;
+  margin:0;
+}
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
+h1{
+  text-align:center;
+  color:#1e3a8a;
+  margin-bottom:25px;
+}
+
+/* Form */
+form{
+  background:#fff;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+  margin-bottom:30px;
+}
+input, select{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  font-size:15px;
+}
+button{
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+.save-btn{
+  background:#2563eb;
+  color:#fff;
+  width:100%;
+  padding:14px;
+  font-size:16px;
+}
+.save-btn:hover{ background:#1e40af; }
+
+/* Cards */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:20px;
+}
+.card{
+  background:#ffffff;
+  border-radius:16px;
+  padding:18px;
+  box-shadow:0 12px 30px rgba(0,0,0,0.08);
+}
+.card h3{
+  margin:0 0 6px;
+  color:#1e3a8a;
+}
+.card p{
+  margin:4px 0;
+  color:#334155;
+}
+.badge{
+  display:inline-block;
+  padding:5px 12px;
+  font-size:12px;
+  border-radius:20px;
+  margin:6px 6px 10px 0;
+}
+.year{ background:#dbeafe; color:#1e40af; }
+.lang{ background:#dcfce7; color:#166534; }
+
+.card a{
+  display:inline-block;
+  margin-top:6px;
+  text-decoration:none;
+  color:#2563eb;
+  font-weight:600;
+}
+
+.actions{
+  margin-top:14px;
+}
+.actions button{
+  padding:8px 14px;
+  margin-right:6px;
+  border-radius:6px;
+  font-size:14px;
+}
+.edit{ background:#f59e0b; color:#fff; }
+.delete{ background:#dc2626; color:#fff; }
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>📚 Admin – D.Pharm Notes Panel</h1>
+
+<form id="noteForm">
+  <input type="hidden" id="docId">
+
+  <input type="text" id="title" placeholder="Note Title" required>
+  <input type="text" id="subject" placeholder="Subject Name" required>
+
+  <select id="year" required>
+    <option value="">Select Year</option>
+    <option>1st Year</option>
+    <option>2nd Year</option>
+  </select>
+
+  <select id="language" required>
+    <option value="">Select Language</option>
+    <option>Hindi</option>
+    <option>English</option>
+  </select>
+
+  <input type="url" id="pdf" placeholder="PDF Link" required>
+
+  <button type="submit" class="save-btn">Save Note</button>
+</form>
+
+<div id="notesList" class="cards"></div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, onSnapshot,
+  deleteDoc, doc, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const notesRef = collection(db,"dpharmaNotes");
+
+const form = document.getElementById("noteForm");
+const notesList = document.getElementById("notesList");
+
+form.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+
+  const docId = document.getElementById("docId").value;
+  const data = {
+    title: title.value,
+    subject: subject.value,
+    year: year.value,
+    language: language.value,
+    pdf: pdf.value,
+    timestamp: serverTimestamp()
+  };
+
+  if(docId){
+    await updateDoc(doc(db,"dpharmaNotes",docId), data);
+  }else{
+    await addDoc(notesRef, data);
+  }
+
+  form.reset();
+  document.getElementById("docId").value="";
+});
+
+onSnapshot(notesRef,(snapshot)=>{
+  notesList.innerHTML="";
+  snapshot.forEach((d)=>{
+    const n = d.data();
+    notesList.innerHTML += `
+      <div class="card">
+        <h3>${n.title}</h3>
+        <p><strong>Subject:</strong> ${n.subject}</p>
+
+        <span class="badge year">${n.year}</span>
+        <span class="badge lang">${n.language}</span>
+
+        <br>
+        <a href="${n.pdf}" target="_blank">📄 View PDF</a>
+
+        <div class="actions">
+          <button class="edit"
+            onclick="editNote('${d.id}','${n.title}','${n.subject}','${n.year}','${n.language}','${n.pdf}')">
+            Edit
+          </button>
+          <button class="delete"
+            onclick="deleteNote('${d.id}')">
+            Delete
+          </button>
+        </div>
+      </div>
+    `;
+  });
+});
+
+window.editNote = (id,t,s,y,l,p)=>{
+  docId.value=id;
+  title.value=t;
+  subject.value=s;
+  year.value=y;
+  language.value=l;
+  pdf.value=p;
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+window.deleteNote = async (id)=>{
+  if(confirm("Delete this note?")){
+    await deleteDoc(doc(db,"dpharmaNotes",id));
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Polytechnic Cutoff Predictor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+  background:#f4f9ff;
+}
+.card-cutoff{
+  border-left:5px solid #0d6efd;
+}
+.top-header{
+background:#1e3a8a;
+padding:15px 20px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.logo-container{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.logo-container img{
+width:60px;
+height:60px;
+border-radius:50%;
+object-fit:cover;
+border:3px solid white;
+box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+.logo-container h2{
+color:white;
+margin:0;
+font-size:22px;
+}
+</style>
+</head>
+
+<body>
+<section><header class="top-header">
+
+  <div class="logo-container">
+    <img src="logo.png" alt="Poly Academy Logo">
+    <h2>Poly Academy</h2>
+  </div>
+</section>
+<nav class="navbar navbar-dark bg-primary">
+  <div class="container">
+    <span class="navbar-brand fw-bold">📊 Polytechnic Cutoff Predictor</span>
+  </div>
+</nav>
+<head><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6313664443076686"
+     crossorigin="anonymous"></script></head>
+<div class="container mt-4">
+
+<!-- INPUT CARD -->
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h5 class="mb-3">Check College Cutoff</h5>
+
+    <div class="row g-2">
+      <div class="col-md-4">
+        <input type="number" id="rank" class="form-control" placeholder="Enter Your Rank">
+      </div>
+
+      <div class="col-md-4">
+        <select id="category" class="form-select">
+          <option value="">Select Category</option>
+          <option>OPEN</option>
+          <option>OBC</option>
+          <option>SC</option>
+          <option>ST</option>
+          <option>EWS</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <button class="btn btn-primary w-100" onclick="findColleges()">
+          🔍 Find Colleges
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="row g-3"></div>
+
+</div>
+
+<!-- Firebase JS -->
+<script type="module">
+import { getFirestore, collection, getDocs, query, where } 
+from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+import { initializeApp } 
+from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+
+/* 🔴 USE YOUR EXISTING CONFIG */
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.findColleges = async () => {
+  const rank = Number(document.getElementById("rank").value);
+  const category = document.getElementById("category").value;
+  const resultDiv = document.getElementById("result");
+
+  resultDiv.innerHTML = "";
+
+  if(!rank || !category){
+    alert("Enter Rank & Category");
+    return;
+  }
+
+  const q = query(
+    collection(db, "cutoffs"),
+    where("category", "==", category)
+  );
+
+  const snap = await getDocs(q);
+
+  let found = false;
+
+  snap.forEach(doc => {
+    const d = doc.data();
+
+    if(rank <= d.closingRank){
+      found = true;
+      resultDiv.innerHTML += `
+        <div class="col-md-6">
+          <div class="card card-cutoff shadow-sm">
+            <div class="card-body">
+              <h5>${d.collegeName}</h5>
+              <p class="mb-1"><b>College Code:</b> ${d.collegeCode}</p>
+              <p class="mb-1"><b>Branch:</b> ${d.branch}</p>
+              <p class="mb-1"><b>District:</b> ${d.district}</p>
+              <span class="badge bg-success">
+              Open Rank: ${d.openRank} /
+                Closing Rank: ${d.closingRank}
+              </span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  if(!found){
+    resultDiv.innerHTML = `
+      <div class="col-12">
+        <div class="alert alert-warning text-center">
+          ❌ No colleges found for your rank
+        </div>
+      </div>
+    `;
+  }
+};
+</script>
+
+</body>
+</html>

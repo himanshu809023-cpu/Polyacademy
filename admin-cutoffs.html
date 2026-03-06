@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin – Cutoff Manager</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{background:#f1f6ff}
+.admin-card{border-left:5px solid #198754}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container">
+    <span class="navbar-brand fw-bold">🔐 Admin Cutoff Panel</span>
+  </div>
+</nav>
+
+<div class="container mt-4">
+<div class="row">
+
+<!-- FORM -->
+<div class="col-md-4">
+<div class="card shadow-sm admin-card">
+<div class="card-body">
+<h5 id="formTitle">Add Cutoff</h5>
+
+<input id="collegeName" class="form-control mb-2" placeholder="College Name">
+<input id="collegeCode" class="form-control mb-2" placeholder="College Code">
+<input id="district" class="form-control mb-2" placeholder="District">
+<input id="branch" class="form-control mb-2" placeholder="Branch">
+
+<select id="category" class="form-select mb-2">
+<option value="">Select Category</option>
+<option>OPEN</option><option>OBC</option>
+<option>SC</option><option>ST</option><option>EWS</option>
+</select>
+<input id="openRank" type="number" class="form-control mb-3" placeholder="Open Rank">
+
+<input id="closingRank" type="number" class="form-control mb-3" placeholder="Closing Rank">
+
+<button id="saveBtn" class="btn btn-success w-100" onclick="saveCutoff()">
+➕ Save Cutoff
+</button>
+</div>
+</div>
+</div>
+
+<!-- LIST -->
+<div class="col-md-8">
+<div class="card shadow-sm">
+<div class="card-body">
+<h5>All Cutoffs</h5>
+<ul id="cutoffList" class="list-group"></ul>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from
+"https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+
+import {
+getFirestore, collection, addDoc, getDocs,
+deleteDoc, doc, updateDoc
+} from
+"https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+authDomain: "hpresult-612a4.firebaseapp.com",
+projectId: "hpresult-612a4",
+messagingSenderId: "938318154272",
+appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let editId = null;
+const list = document.getElementById("cutoffList");
+
+window.saveCutoff = async () => {
+const data = {
+collegeName: collegeName.value,
+collegeCode: collegeCode.value,
+district: district.value,
+branch: branch.value,
+category: category.value,
+openRank: Number(openRank.value),
+closingRank: Number(closingRank.value)
+};
+
+if(Object.values(data).includes("") || !data.closingRank){
+alert("Fill all fields");
+return;
+}
+
+if(editId){
+await updateDoc(doc(db,"cutoffs",editId),data);
+editId=null;
+saveBtn.innerHTML="➕ Save Cutoff";
+formTitle.innerText="Add Cutoff";
+}else{
+await addDoc(collection(db,"cutoffs"),data);
+}
+
+clearForm();
+loadCutoffs();
+};
+
+function clearForm(){
+document.querySelectorAll("input,select").forEach(e=>e.value="");
+}
+
+async function loadCutoffs(){
+list.innerHTML="";
+const snap=await getDocs(collection(db,"cutoffs"));
+
+snap.forEach(d=>{
+const c=d.data();
+list.innerHTML+=`
+<li class="list-group-item">
+<b>${c.collegeName}</b> (${c.branch})<br>
+<small>${c.category}  Rank / Close Rank :- ${c.openRank}, ${c.closingRank}</small>
+<div class="mt-2">
+<button class="btn btn-sm btn-primary me-2"
+onclick="editCutoff('${d.id}',
+'${c.collegeName}','${c.collegeCode}',
+'${c.district}','${c.branch}',
+'${c.category}','${c.openRank}',${c.closingRank})">
+Edit</button>
+
+<button class="btn btn-sm btn-danger"
+onclick="removeCutoff('${d.id}')">
+Delete</button>
+</div>
+</li>`;
+});
+}
+
+window.editCutoff=(id,cn,cc,dist,br,cat,rank)=>{
+editId=id;
+collegeName.value=cn;
+collegeCode.value=cc;
+district.value=dist;
+branch.value=br;
+category.value=cat;
+closingRank.value=rank;
+formTitle.innerText="Edit Cutoff";
+saveBtn.innerHTML="✏️ Update Cutoff";
+};
+
+window.removeCutoff=async(id)=>{
+if(confirm("Delete this cutoff?")){
+await deleteDoc(doc(db,"cutoffs",id));
+loadCutoffs();
+}
+};
+
+loadCutoffs();
+</script>
+
+</body>
+</html>

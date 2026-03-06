@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Instructions - PolyAcademy</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f1f5f9;
+}
+
+header{
+  background:#1e40af;
+  color:white;
+  padding:15px;
+  text-align:center;
+}
+
+.container{
+  padding:20px;
+}
+
+.box{
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.05);
+}
+
+h2{
+  margin-top:0;
+}
+
+ul{
+  padding-left:20px;
+}
+
+button{
+  margin-top:20px;
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  background:#1e40af;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#1a3696;
+}
+.top-header{
+background:#1e3a8a;
+padding:15px 20px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.logo-container{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.logo-container img{
+width:60px;
+height:60px;
+border-radius:50%;
+object-fit:cover;
+border:3px solid white;
+box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+.logo-container h2{
+color:white;
+margin:0;
+font-size:22px;
+}
+</style>
+</head>
+
+<body>
+<header class="top-header">
+
+  <div class="logo-container">
+    <img src="logo.png" alt="Poly Academy Logo">
+    <h2>Poly Academy</h2>
+  </div>
+
+</header>
+<header><h2>Test Instructions</h2></header>
+
+<div class="container">
+  <div class="box" id="instructionBox">
+    Loading test details...
+  </div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const testId = localStorage.getItem("selectedTest");
+
+async function loadInstructions(){
+
+  if(!testId){
+    document.getElementById("instructionBox").innerHTML =
+    "No Test Selected";
+    return;
+  }
+
+  const docRef = doc(db, "tests", testId);
+  const snap = await getDoc(docRef);
+
+  if(!snap.exists()){
+    document.getElementById("instructionBox").innerHTML =
+    "Test Not Found";
+    return;
+  }
+
+  const t = snap.data();
+
+  document.getElementById("instructionBox").innerHTML = `
+    <b{t.name}</b>
+    <p><strong>Subject:</strong> ${t.subject}</p>
+    <p><strong>Total Questions:</strong> ${t.totalQuestions}</p>
+    <p><strong>Duration:</strong> ${t.duration} Minutes</p>
+
+    <h3>Important Instructions:</h3>
+    <ul>
+      <li>Each correct answer carries +4 marks.</li>
+      <li>Each wrong answer carries 0 mark.</li>
+      <li>No marks for unanswered questions.</li>
+      <li>Test will auto-submit after time ends.</li>
+      <li>Do not refresh or close the browser during the test.</li>
+    </ul>
+
+    <button onclick="startTest()">Start Test</button>
+  `;
+}
+
+window.startTest = function(){
+  window.location.href = "mock-test.html";
+}
+
+loadInstructions();
+
+</script>
+
+</body>
+</html>

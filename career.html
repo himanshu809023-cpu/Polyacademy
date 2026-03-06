@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career & Guidance</title>
+<style>
+body{
+  font-family:Arial,sans-serif;
+  background:#f1f5f9;
+  margin:0;
+  padding:0;
+}
+
+header{
+  background:#1E40AF;
+  color:#fff;
+  padding:15px;
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.container{
+  max-width:1000px;
+  margin:20px auto;
+  padding:10px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+  gap:15px;
+}
+
+.card{
+  background:#fff;
+  border-radius:10px;
+  padding:15px;
+  box-shadow:0 3px 8px rgba(0,0,0,0.1);
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 6px 15px rgba(0,0,0,0.15);
+}
+
+.card h3{
+  color:#1E40AF;
+  margin-top:0;
+  font-size:18px;
+}
+
+.card p{
+  color:#374151;
+  font-size:14px;
+  margin:8px 0;
+}
+
+.card a{
+  display:inline-block;
+  margin-top:8px;
+  text-decoration:none;
+  color:#2563EB;
+  font-weight:bold;
+  transition:0.2s;
+}
+
+.card a:hover{
+  text-decoration:underline;
+}
+
+.no-data{
+  grid-column:1/-1;
+  text-align:center;
+  color:#6b7280;
+  font-size:16px;
+}
+.site-logo{
+    height:55px;
+}
+
+.site-title{
+    font-size:20px;
+    font-weight:600;
+ 
+}
+
+  .top-header{
+  background:#1e3a8a;
+  padding:15px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  }
+  
+  .logo-container{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  }
+  
+  .logo-container img{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid white;
+  box-shadow:0 4px 10px rgba(0,0,0,0.3);
+  }
+  
+  .logo-container h2{
+  color:white;
+  margin:0;
+  font-size:22px;
+  }
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #ffffff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+    border-top: 1px solid #eee;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: #777;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: 0.3s;
+}
+
+.nav-item i {
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+
+.nav-item.active {
+    color: #1E4DB7;
+    font-weight: 600;
+}
+
+.nav-item:hover {
+    color: #1E4DB7;
+}
+</style>
+</head>
+
+<body>
+<header class="top-header">
+
+  <div class="logo-container">
+    <img src="logo.png" alt="Poly Academy Logo">
+    <h2>Poly Academy</h2>
+  </div>
+
+</header>
+
+<header>🎯 Career & Guidance – Polytechnic Students</header>
+<head><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6313664443076686"
+     crossorigin="anonymous"></script></head>
+<div class="container" id="careerContainer">
+  <div class="no-data">Loading resources...</div>
+</div>
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bottom-nav">
+    <a href="index.html" class="nav-item active">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+    </a>
+
+    <a href="notes.html" class="nav-item">
+        <i class="fa-solid fa-book-open"></i>
+        <span>poly notes</span>
+    </a>
+
+    <a href="mentor.html" class="nav-item">
+        <i class="fa-solid fa-chalkboard-user"></i>
+        <span>Mentors</span>
+    </a>
+<a href="dpharma.html" class="nav-item">
+        <i class="fa-solid fa-book-open"></i>
+        <span>dpharma</span>
+    </a>
+    <a href="entrance.html" class="nav-item">
+        <i class="fa-solid fa-users"></i>
+        <span>Entrance</span>
+    </a>
+<a href="notice.html" class="nav-item">
+        <i class="fa-solid fa-bell"></i>
+        <span>Notices</span>
+    </a>
+    <a href="profile.html" class="nav-item">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
+    </a>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot, query, orderBy } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const container = document.getElementById("careerContainer");
+
+const q = query(collection(db,"career_resources"), orderBy("createdAt","desc"));
+
+onSnapshot(q,snapshot=>{
+  let html = "";
+  snapshot.forEach(doc=>{
+    const d = doc.data();
+    html += `
+      <div class="card">
+        <h3>${d.title}</h3>
+        <p>${d.description}</p>
+        ${d.link ? `<a href="${d.link}" target="_blank">View Resource</a>` : ''}
+      </div>
+    `;
+  });
+  container.innerHTML = html || '<div class="no-data">No resources available.</div>';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>D.Pharm Notes | Diploma in Pharmacy Study Material</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="description" content="Download D.Pharm notes PDF. Subject wise, year wise Diploma in Pharmacy notes in Hindi and English.">
+
+<style>
+body{
+  margin:0;
+  font-family:"Segoe UI", Arial, sans-serif;
+  background:#f8fafc;
+  color:#1f2937;
+}
+
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
+
+/* Header */
+.header{
+  background:linear-gradient(135deg,#16a34a,#22c55e);
+  color:#fff;
+  padding:32px;
+  border-radius:20px;
+  text-align:center;
+}
+
+/* Filters */
+.filters{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:14px;
+  margin:30px 0;
+}
+
+.filters input,
+.filters select{
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #cbd5f5;
+  font-size:14px;
+}
+
+/* Notes Grid */
+.notes-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+}
+
+.note{
+  background:#ffffff;
+  padding:18px;
+  border-radius:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.06);
+  transition:0.3s;
+}
+
+.note:hover{
+  transform:translateY(-5px);
+}
+
+.note h4{
+  margin:0;
+  color:#2563eb;
+}
+
+.note small{
+  color:#6b7280;
+  font-size:13px;
+}
+
+.badge{
+  display:inline-block;
+  margin-top:8px;
+  background:#eef2ff;
+  color:#4338ca;
+  padding:4px 10px;
+  border-radius:14px;
+  font-size:12px;
+}
+
+.note a{
+  display:inline-block;
+  margin-top:12px;
+  padding:10px 18px;
+  background:#2563eb;
+  color:#fff;
+  text-decoration:none;
+  border-radius:22px;
+  font-size:14px;
+}
+
+/* Info Sections */
+.section{
+  background:#ffffff;
+  margin-top:30px;
+  padding:22px;
+  border-radius:16px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.05);
+}
+
+.section h2{
+  color:#15803d;
+}
+
+.cta{
+  margin:40px 0;
+  text-align:center;
+}
+
+.cta a{
+  padding:16px 34px;
+  background:#22c55e;
+  color:#fff;
+  border-radius:40px;
+  text-decoration:none;
+  font-weight:600;
+}
+.top-header{
+background:#1e3a8a;
+padding:15px 20px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.logo-container{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.logo-container img{
+width:60px;
+height:60px;
+border-radius:50%;
+object-fit:cover;
+border:3px solid white;
+box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+.logo-container h2{
+color:white;
+margin:0;
+font-size:22px;
+}
+</style>
+</head>
+
+<body>
+<header class="top-header">
+
+  <div class="logo-container">
+    <img src="logo.png" alt="Poly Academy Logo">
+    <h2>Poly Academy</h2>
+  </div>
+
+</header>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>D.Pharm Notes & Study Material</h1>
+    <p>
+      Subject-wise Diploma in Pharmacy Notes (PDF)  
+      <br><b>डी फार्मेसी के नोट्स – हिंदी और इंग्लिश</b>
+    </p>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <input type="text" id="search" placeholder="Search subject / title">
+
+    <select id="yearFilter">
+      <option value="">All Years</option>
+      <option value="First Year">First Year</option>
+      <option value="Second Year">Second Year</option>
+    </select>
+
+    <select id="langFilter">
+      <option value="">All Languages</option>
+      <option value="English">English</option>
+      <option value="Hindi">Hindi</option>
+    </select>
+  </div>
+
+  <!-- Notes -->
+  <div class="notes-grid" id="notesBox">
+    <p>Loading notes...</p>
+  </div>
+
+  <!-- Info -->
+  <div class="section">
+    <h2>📌 About D.Pharm</h2>
+    <p>
+      Diploma in Pharmacy (D.Pharm) is a 2-year professional course related to medicines, drug dispensing and healthcare.
+      <br><br>
+      <b>डी फार्मेसी</b> मेडिकल स्टोर, हॉस्पिटल और फार्मा इंडस्ट्री के लिए एक बेहतरीन कोर्स है।
+    </p>
+  </div>
+
+  <!-- Career -->
+  <div class="section">
+    <h2>💼 Career Scope</h2>
+    <ul>
+      <li>Registered Pharmacist</li>
+      <li>Medical Store Owner</li>
+      <li>Hospital Pharmacy</li>
+      <li>B.Pharm (Lateral Entry)</li>
+    </ul>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <a href="mentor.html">💬 Talk to D.Pharm Mentor</a>
+  </div>
+
+</div>
+
+<!-- 🔥 Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot, query, orderBy }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const notesBox = document.getElementById("notesBox");
+const search = document.getElementById("search");
+const yearFilter = document.getElementById("yearFilter");
+const langFilter = document.getElementById("langFilter");
+
+let notesData = [];
+
+onSnapshot(
+  query(collection(db,"dpharmaNotes"), orderBy("timestamp","desc")),
+  snap=>{
+    notesData = [];
+    snap.forEach(d=>notesData.push(d.data()));
+    render();
+  }
+);
+
+function render(){
+  const s = search.value.toLowerCase();
+  const y = yearFilter.value;
+  const l = langFilter.value;
+
+  notesBox.innerHTML = "";
+
+  const filtered = notesData.filter(n=>{
+    return (
+      (!s || n.title.toLowerCase().includes(s)) &&
+      (!y || n.year === y) &&
+      (!l || n.language === l)
+    );
+  });
+
+  if(filtered.length === 0){
+    notesBox.innerHTML = "<p>No notes found.</p>";
+    return;
+  }
+
+  filtered.forEach(n=>{
+    notesBox.innerHTML += `
+      <div class="note">
+        <h4>${n.title}</h4>
+        <small>${n.subject} • ${n.year}</small><br>
+        <span class="badge">${n.language}</span><br>
+        <a href="${n.pdf}" target="_blank">📥 Download PDF</a>
+      </div>
+    `;
+  });
+}
+
+search.oninput = render;
+yearFilter.onchange = render;
+langFilter.onchange = render;
+</script>
+
+</body>
+</html>

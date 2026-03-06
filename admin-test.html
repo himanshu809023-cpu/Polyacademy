@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Complete Test Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#f1f5f9;
+}
+
+.header{
+  background:#1e3a8a;
+  color:white;
+  padding:18px;
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:20px;
+}
+
+.section{
+  background:white;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.08);
+  margin-bottom:25px;
+}
+
+h2{margin-top:0;}
+
+input,select{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+button{
+  padding:8px 14px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  margin:5px 5px 5px 0;
+  color:white;
+}
+
+.green{background:#16a34a;}
+.red{background:#dc2626;}
+.orange{background:#f59e0b;}
+.blue{background:#2563eb;}
+
+.card{
+  background:#f8fafc;
+  padding:12px;
+  border-radius:10px;
+  margin-top:10px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">PolyAcademy Test Management Panel</div>
+
+<div class="container">
+
+<!-- ADD TEST -->
+<div class="section">
+<h2>Create Test</h2>
+
+<input type="text" id="testName" placeholder="Test Name">
+<input type="text" id="subject" placeholder="Subject Name">
+
+<input type="number" id="duration" placeholder="Time (Minutes)">
+<input type="number" id="totalQuestions" placeholder="Total Questions">
+<input type="number" id="totalMarks" placeholder="Total Marks">
+<input type="number" id="negativeMarks" placeholder="Negative Mark Per Question">
+
+<button class="green" onclick="addTest()">Add Test</button>
+
+<h3>All Tests</h3>
+<div id="testList"></div>
+</div>
+
+<!-- QUESTION SECTION -->
+<div class="section">
+<h2>Add / Edit Question</h2>
+
+<select id="testSelect"></select>
+
+<input type="text" id="question" placeholder="Question">
+<input type="text" id="opt1" placeholder="Option 1">
+<input type="text" id="opt2" placeholder="Option 2">
+<input type="text" id="opt3" placeholder="Option 3">
+<input type="text" id="opt4" placeholder="Option 4">
+<input type="number" id="correct" placeholder="Correct Option (1-4)">
+
+<button class="blue" onclick="saveQuestion()">Save Question</button>
+
+<h3>Questions List</h3>
+<div id="questionList"></div>
+
+</div>
+
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+
+var firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
+
+let editingId = null;
+
+
+// ADD TEST
+function addTest(){
+
+  if(!testName.value) return alert("Enter Test Name");
+
+  db.collection("tests").add({
+    name:testName.value,
+    subject:subject.value,
+    duration:Number(duration.value),
+    totalQuestions:Number(totalQuestions.value),
+    totalMarks:Number(totalMarks.value),
+    negative:Number(negativeMarks.value),
+    active:true,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{
+    testName.value="";
+    subject.value="";
+    duration.value="";
+    totalQuestions.value="";
+    totalMarks.value="";
+    negativeMarks.value="";
+  });
+}
+
+
+// LOAD TESTS
+function loadTests(){
+  db.collection("tests").orderBy("createdAt","desc")
+  .onSnapshot(snapshot=>{
+
+    testList.innerHTML="";
+    testSelect.innerHTML="";
+
+    snapshot.forEach(doc=>{
+      let t=doc.data();
+
+      testList.innerHTML+=`
+      <div class="card">
+        <b>${t.name}</b><br>
+        subject: ${t.subject} |
+        Time: ${t.duration} min |
+        Questions: ${t.totalQuestions} |
+        Marks: ${t.totalMarks} |
+        Negative: ${t.negative}<br>
+        Status: ${t.active ? "Active" : "Inactive"}<br><br>
+
+        <button class="orange" onclick="toggleTest('${doc.id}',${t.active})">Toggle</button>
+        <button class="red" onclick="deleteTest('${doc.id}')">Delete</button>
+      </div>
+      `;
+
+      testSelect.innerHTML+=`
+        <option value="${doc.id}">${t.name}</option>
+      `;
+    });
+
+    loadQuestions();
+  });
+}
+
+function toggleTest(id,status){
+  db.collection("tests").doc(id).update({
+    active:!status
+  });
+}
+
+function deleteTest(id){
+  db.collection("tests").doc(id).delete();
+}
+
+
+// SAVE QUESTION
+async function saveQuestion(){
+
+  let testId=testSelect.value;
+
+  let data={
+    testId:testId,
+    question:question.value,
+    option1:opt1.value,
+    option2:opt2.value,
+    option3:opt3.value,
+    option4:opt4.value,
+    correct:Number(correct.value)
+  };
+
+  if(editingId){
+    await db.collection("questions").doc(editingId).update(data);
+    editingId=null;
+  }else{
+    await db.collection("questions").add(data);
+  }
+
+  clearForm();
+  loadQuestions();
+}
+
+
+// LOAD QUESTIONS
+function loadQuestions(){
+
+  let testId=testSelect.value;
+  if(!testId) return;
+
+  db.collection("questions")
+  .where("testId","==",testId)
+  .get()
+  .then(snapshot=>{
+
+    questionList.innerHTML="";
+    let count=1;
+
+    snapshot.forEach(doc=>{
+      let q=doc.data();
+
+      questionList.innerHTML+=`
+      <div class="card">
+        <b>Q${count}. ${q.question}</b><br><br>
+
+        1) ${q.option1}<br>
+        2) ${q.option2}<br>
+        3) ${q.option3}<br>
+        4) ${q.option4}<br><br>
+
+        ✔ Correct: ${q.correct}<br><br>
+
+        <button class="blue" onclick="editQuestion('${doc.id}')">Edit</button>
+        <button class="red" onclick="deleteQuestion('${doc.id}')">Delete</button>
+      </div>
+      `;
+      count++;
+    });
+
+  });
+}
+
+
+// EDIT
+function editQuestion(id){
+  db.collection("questions").doc(id).get().then(doc=>{
+    let q=doc.data();
+
+    question.value=q.question;
+    opt1.value=q.option1;
+    opt2.value=q.option2;
+    opt3.value=q.option3;
+    opt4.value=q.option4;
+    correct.value=q.correct;
+
+    editingId=id;
+    window.scrollTo(0,0);
+  });
+}
+
+
+// DELETE
+function deleteQuestion(id){
+  if(!confirm("Delete this question?")) return;
+  db.collection("questions").doc(id).delete().then(loadQuestions);
+}
+
+
+// CLEAR
+function clearForm(){
+  question.value="";
+  opt1.value="";
+  opt2.value="";
+  opt3.value="";
+  opt4.value="";
+  correct.value="";
+}
+
+testSelect.addEventListener("change",loadQuestions);
+
+loadTests();
+
+</script>
+</body>
+</html>

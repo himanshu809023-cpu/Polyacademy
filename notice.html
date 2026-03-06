@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Notices & Announcements</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f1f5f9;
+}
+
+header{
+  background:#1E40AF;
+  color:#fff;
+  padding:15px;
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.search-box{
+  max-width:700px;
+  margin:15px auto;
+  padding:0 10px;
+}
+
+.search-box input{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #cbd5e1;
+}
+
+.notice-wrapper{
+  max-width:700px;
+  margin:10px auto 30px;
+  padding:10px;
+}
+
+.notice-card{
+  background:#ffffff;
+  border-left:5px solid #2563EB;
+  padding:15px;
+  margin-bottom:12px;
+  border-radius:8px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.08);
+  position:relative;
+}
+
+.notice-card.important{
+  border-left-color:#dc2626;
+  background:#fff7ed;
+}
+
+.badge{
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:#dc2626;
+  color:#fff;
+  font-size:11px;
+  padding:3px 6px;
+  border-radius:4px;
+}
+
+.notice-card h3{
+  margin:0;
+  color:#1E3A8A;
+  font-size:16px;
+}
+
+.notice-card p{
+  margin:6px 0;
+  font-size:14px;
+  color:#374151;
+}
+
+.notice-card small{
+  font-size:11px;
+  color:#6b7280;
+}
+
+.category{
+  font-size:11px;
+  background:#e0e7ff;
+  color:#1e40af;
+  display:inline-block;
+  padding:2px 6px;
+  border-radius:4px;
+  margin-bottom:5px;
+}
+
+.share-btn{
+  margin-top:6px;
+  font-size:12px;
+  background:#2563EB;
+  color:#fff;
+  border:none;
+  padding:4px 8px;
+  border-radius:4px;
+  cursor:pointer;
+}
+
+.no-data{
+  text-align:center;
+  color:#6b7280;
+  margin-top:30px;
+}
+
+/* Popup */
+.popup{
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.popup-content{
+  background:#fff;
+  padding:20px;
+  max-width:400px;
+  border-radius:8px;
+  text-align:center;
+}
+
+.popup-content h3{
+  margin-top:0;
+  color:#1e40af;
+}
+
+.popup-content button{
+  margin-top:10px;
+  padding:6px 12px;
+  border:none;
+  background:#2563EB;
+  color:#fff;
+  border-radius:5px;
+}
+header{
+  background:#1E40AF;
+  color:#fff;
+  padding:10px 15px;
+}
+
+.nav-container{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.logo{
+  font-weight:bold;
+  font-size:18px;
+}
+
+nav a{
+  color:#fff;
+  text-decoration:none;
+  margin-left:15px;
+  padding:6px 10px;
+  border-radius:6px;
+  transition:0.2s;
+  font-size:14px;
+}
+
+nav a:hover{
+  background:#2563EB;
+}
+.top-header{
+background:#1e3a8a;
+padding:15px 20px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.logo-container{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.logo-container img{
+width:60px;
+height:60px;
+border-radius:50%;
+object-fit:cover;
+border:3px solid white;
+box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+.logo-container h2{
+color:white;
+margin:0;
+font-size:22px;
+}
+</style>
+</head>
+
+<body>
+
+<header><header class="top-header">
+
+  <div class="logo-container">
+    <img src="logo.png" alt="Poly Academy Logo">
+    <h2>Poly Academy</h2>
+  </div>
+
+</header></header>
+<header>
+  <div class="nav-container">
+    <span class="logo">📢 Polytechnic Notices</span>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="entrance.html">Entrance</a>
+      <a href="semester.html">Semester</a>
+      <a href="studyplanner.html">Study Planner</a>
+      <a href="contact.html">Contact</a>
+      <a href="about.html">About Us</a>
+      <a href="privacy.html">Privacy Policy</a>
+    </nav>
+  </div>
+</header>
+<head><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6313664443076686"
+     crossorigin="anonymous"></script></head>
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="Search notice...">
+</div>
+
+<div class="notice-wrapper" id="noticeContainer">
+  <div class="no-data">Loading notices...</div>
+</div>
+
+<!-- Popup -->
+<div class="popup" id="popup">
+  <div class="popup-content" id="popupContent"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from
+"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot, query, orderBy }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const noticeContainer = document.getElementById("noticeContainer");
+const searchInput = document.getElementById("searchInput");
+const popup = document.getElementById("popup");
+const popupContent = document.getElementById("popupContent");
+
+let allNotices = [];
+
+const q = query(
+  collection(db,"entrance_notices"),
+  orderBy("createdAt","desc")
+);
+
+onSnapshot(q, snapshot=>{
+  allNotices = [];
+  noticeContainer.innerHTML="";
+  const now = Date.now();
+
+  snapshot.forEach(doc=>{
+    const d = doc.data();
+
+    // Auto Expire
+    if(d.expireAt && d.expireAt < now) return;
+
+    allNotices.push(d);
+  });
+
+  if(allNotices.length === 0){
+    noticeContainer.innerHTML =
+      `<div class="no-data">No notices available</div>`;
+    return;
+  }
+
+  renderNotices(allNotices);
+
+  // Popup latest important notice
+  const imp = allNotices.find(n => n.important);
+  if(imp){
+    popupContent.innerHTML = `
+      <h3>${imp.title}</h3>
+      <p>${imp.message}</p>
+      <button onclick="closePopup()">Close</button>
+    `;
+    popup.style.display="flex";
+  }
+});
+
+function renderNotices(list){
+  noticeContainer.innerHTML="";
+  list.forEach(d=>{
+    noticeContainer.innerHTML += `
+      <div class="notice-card ${d.important ? 'important':''}">
+        ${d.important ? '<div class="badge">IMPORTANT</div>':''}
+        <div class="category">${d.category}</div>
+        <h3>${d.title}</h3>
+        <p>${d.message}</p>
+        <a class="link" href="${d.pageLink}" target="_blank"><h3>🔗 Open</h3></a>
+        <small>🕒 ${d.time}</small><br>
+        <button class="share-btn"
+        onclick="shareNotice('${d.title}','${d.message}')">
+        Share
+        </button>
+      </div>
+    `;
+  });
+}
+
+searchInput.addEventListener("input", ()=>{
+  const val = searchInput.value.toLowerCase();
+  const filtered = allNotices.filter(n =>
+    n.title.toLowerCase().includes(val) ||
+    n.message.toLowerCase().includes(val)
+  );
+  renderNotices(filtered);
+});
+
+window.shareNotice = (title,msg)=>{
+  if(navigator.share){
+    navigator.share({ title, text: msg });
+  }else{
+    alert("Sharing not supported");
+  }
+}
+
+window.closePopup = ()=>{
+  popup.style.display="none";
+}
+</script>
+
+</body>
+</html>

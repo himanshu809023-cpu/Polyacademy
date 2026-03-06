@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JEECUP CBT Test</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f1f5f9;
+}
+
+/* HEADER */
+header{
+  background:#1e40af;
+  color:white;
+  padding:12px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:16px;
+}
+
+/* MAIN LAYOUT */
+.container{
+  display:flex;
+  height:calc(100vh - 60px);
+}
+
+/* LEFT SIDE */
+.left{
+  flex:3;
+  padding:20px;
+  background:white;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.questionCard{
+  background:#ffffff;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+
+.option{
+  margin:10px 0;
+  padding:10px;
+  border:1px solid #cbd5e1;
+  border-radius:6px;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.option:hover{
+  background:#eef2ff;
+}
+
+/* RIGHT SIDE */
+.right{
+  flex:1;
+  background:#e2e8f0;
+  padding:15px;
+  overflow-y:auto;
+}
+
+.palette{
+  display:flex;
+  flex-wrap:wrap;
+}
+
+.navBtn{
+  width:38px;
+  height:38px;
+  margin:4px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.notVisited{ background:#cbd5e1; }
+.answered{ background:#16a34a; color:white; }
+.review{ background:#f59e0b; color:white; }
+
+/* LEGEND */
+.legend{
+  margin-top:15px;
+  font-size:14px;
+}
+
+.legend div{
+  margin:5px 0;
+}
+
+/* FIXED BOTTOM NAV */
+.bottomNav{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+
+.bottomNav button{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.primary{
+  background:#1e40af;
+  color:white;
+}
+
+.secondary{
+  background:#64748b;
+  color:white;
+}
+
+.danger{
+  background:#dc2626;
+  color:white;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+  .container{
+    flex-direction:column;
+  }
+
+  .right{
+    height:250px;
+  }
+}
+.top-header{
+background:#1e3a8a;
+padding:15px 20px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.logo-container{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.logo-container img{
+width:60px;
+height:60px;
+border-radius:50%;
+object-fit:cover;
+border:3px solid white;
+box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+.logo-container h2{
+color:white;
+margin:0;
+font-size:22px;
+}
+</style>
+</head>
+
+<body>
+<header class="top-header">
+
+  <div class="logo-container">
+    <img src="logo.png" alt="Poly Academy Logo">
+    <h2>Poly Academy</h2>
+  </div>
+
+</header>
+<header>
+  <div>JEECUP CBT Test</div>
+  <div id="timer">Time Left: --</div>
+</header>
+
+<div class="container">
+
+  <!-- LEFT SIDE -->
+  <div class="left">
+
+    <div class="questionCard" id="questionBox">
+      Loading Question...
+    </div>
+
+    <div class="bottomNav">
+      <button class="secondary" onclick="prevQuestion()">Previous</button>
+      <button class="primary" onclick="saveNext()">Save & Next</button>
+      <button class="danger" onclick="confirmSubmit()">Submit</button>
+    </div>
+
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="right">
+    <h3>Question Palette</h3>
+    <div class="palette" id="palette"></div>
+
+    <div class="legend">
+      <div><span style="background:#16a34a;padding:4px 8px;border-radius:4px;color:white;">&nbsp;</span> Answered</div>
+      <div><span style="background:#f59e0b;padding:4px 8px;border-radius:4px;color:white;">&nbsp;</span> Marked Review</div>
+      <div><span style="background:#cbd5e1;padding:4px 8px;border-radius:4px;">&nbsp;</span> Not Visited</div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+const testId=localStorage.getItem("selectedTest");
+
+let questions=[];
+let current=0;
+let answers={};
+let reviewList={};
+let time=7200; // 2 hours
+
+async function loadQuestions(){
+  const q=query(collection(db,"questions"),where("testId","==",testId));
+  const snap=await getDocs(q);
+
+  snap.forEach(doc=>{
+    questions.push({id:doc.id,...doc.data()});
+  });
+
+  createPalette();
+  showQuestion();
+  startTimer();
+}
+
+function showQuestion(){
+  const q=questions[current];
+  if(!q) return;
+
+  document.getElementById("questionBox").innerHTML=`
+    <h3>Q${current+1}. ${q.question}</h3>
+    ${[1,2,3,4].map(i=>`
+      <div class="option">
+        <input type="radio" name="opt" value="${i}"
+        ${answers[current]==i?"checked":""}>
+        ${q["option"+i]}
+      </div>
+    `).join("")}
+  `;
+
+  updatePalette();
+}
+
+window.saveNext=function(){
+  const selected=document.querySelector('input[name="opt"]:checked');
+  if(selected){
+    answers[current]=parseInt(selected.value);
+  }
+  if(current<questions.length-1){
+    current++;
+    showQuestion();
+  }
+}
+
+window.prevQuestion=function(){
+  if(current>0){
+    current--;
+    showQuestion();
+  }
+}
+
+function createPalette(){
+  const p=document.getElementById("palette");
+  questions.forEach((q,i)=>{
+    p.innerHTML+=`
+      <button class="navBtn notVisited" id="p${i}" onclick="goQ(${i})">${i+1}</button>
+    `;
+  });
+}
+
+window.goQ=function(i){
+  current=i;
+  showQuestion();
+}
+
+function updatePalette(){
+  questions.forEach((q,i)=>{
+    const btn=document.getElementById("p"+i);
+    btn.className="navBtn ";
+    if(reviewList[i]) btn.classList.add("review");
+    else if(answers[i]) btn.classList.add("answered");
+    else btn.classList.add("notVisited");
+  });
+}
+
+function startTimer(){
+  setInterval(()=>{
+    let min=Math.floor(time/60);
+    let sec=time%60;
+    document.getElementById("timer").innerText=
+      `Time Left: ${min}:${sec<10?"0":""}${sec}`;
+    time--;
+    if(time<0) submitTest();
+  },1000);
+}
+
+window.confirmSubmit=function(){
+  if(confirm("Are you sure you want to submit the test?")){
+    submitTest();
+  }
+}
+
+function submitTest(){
+  let correct=0, wrong=0;
+
+  questions.forEach((q,i)=>{
+    if(answers[i]){
+      if(answers[i]===q.correct) correct++;
+      else wrong++;
+    }
+  });
+
+  let score=(correct*4)-(wrong*0);
+
+  localStorage.setItem("resultData",
+    JSON.stringify({correct,wrong,score,total:questions.length})
+  );
+
+  window.location.href="result.html";
+}
+
+loadQuestions();
+
+</script>
+
+</body>
+</html>

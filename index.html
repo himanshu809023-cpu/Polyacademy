@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Polytechnic Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="google-site-verification" content="0qJfS-nuecL5EgaKrOjX7ZWtrTW9peR9gaJqYUBDL4Q" />
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background:#f1f5f9;
+  color:#1e293b;
+}
+
+/* NAVBAR */
+
+/* HERO */
+.hero{
+  background:linear-gradient(135deg,#2563EB,#1E40AF);
+  color:#fff;
+  text-align:center;
+  padding:20px 10px;
+}
+.hero h2{
+  margin:0;
+  font-size:28px;
+}
+.hero p{
+  margin-top:10px;
+  font-size:15px;
+  opacity:0.9;
+}
+
+/* SECTIONS */
+.container{
+  max-width:1100px;
+  margin:35px auto;
+  padding:0 15px;
+}
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+}
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:25px;
+  text-align:center;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+  transition:.3s;
+}
+.card:hover{
+  transform:translateY(-6px);
+}
+.card h3{
+  color:#2563EB;
+  margin-bottom:10px;
+}
+.card p{
+  font-size:14px;
+  color:#475569;
+}
+.card a{
+  display:inline-block;
+  margin-top:15px;
+  padding:10px 18px;
+  background:#2563EB;
+  color:#fff;
+  border-radius:8px;
+  text-decoration:none;
+  font-weight:600;
+}
+.card a:hover{
+  background:#1E40AF;
+}
+
+/* FOOTER */
+footer{
+  text-align:center;
+  padding:15px;
+  font-size:13px;
+  color:#64748b;
+}
+.wa-channel-btn{
+  display:inline-block;
+  padding:10px 10px;
+  background:#25D366;
+  color:#fff;
+  font-weight:600;
+  border-radius:40px;
+  text-decoration:none;
+  transition:0.3s ease;
+  box-shadow:0 6px 18px rgba(0,0,0,0.2);
+}
+
+.wa-channel-btn:hover{
+  background:#1da851;
+  transform:translateY(-3px) scale(1.05);
+}
+.share-btn{
+  position:fixed;
+  right:10px;
+  top:1px;
+  background:linear-gradient(135deg,#198754,#20c997);
+  color:#fff;
+  border:none;
+  padding:12px 18px;
+  border-radius:30px;
+  font-size:14px;
+  font-weight:500;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,0,0,0.3);
+  transition:0.3s;
+  z-index:999;
+}
+
+.share-btn:hover{
+  transform:scale(1.08);
+}
+
+
+.view-card{
+  margin:15px auto;
+  width:220px;
+  text-align:center;
+  background:#e0e7ff;
+  color:#1E40AF;
+  padding:10px;
+  border-radius:10px;
+  font-weight:700;
+  box-shadow:0 4px 8px rgba(0,0,0,0.1);
+}
+.feedback-section{
+  max-width:700px;
+  margin:40px auto;
+  padding:20px;
+  background:#f5f9ff;
+  border-radius:12px;
+}
+
+.feedback-section h2{
+  text-align:center;
+  color:#0d6efd;
+}
+
+#feedbackForm input,
+#feedbackForm select,
+#feedbackForm textarea{
+  width:100%;
+  margin:8px 0;
+  padding:10px;
+  border:1px solid #ccc;
+  border-radius:8px;
+}
+
+#feedbackForm button{
+  width:100%;
+  padding:10px;
+  background:#0d6efd;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.feedback-card{
+  background:#fff;
+  padding:10px;
+  margin-top:10px;
+  border-radius:8px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+.top-header{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:10px 20px;
+    background:#1e3a8a;
+    color:white;
+}
+
+.top-header{
+background:#1e3a8a;
+padding:15px 20px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.logo-container{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.logo-container img{
+width:60px;
+height:60px;
+border-radius:50%;
+object-fit:cover;
+border:3px solid white;
+box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+.logo-container h2{
+color:white;
+margin:0;
+font-size:22px;
+}
+#polyAiBtn{
+position:fixed;
+right:20px;
+bottom:80px;
+background:linear-gradient(135deg,#00c6ff,#0072ff);
+color:white;
+border-radius:50px;
+padding:12px 18px;
+display:flex;
+align-items:center;
+gap:8px;
+font-family:Poppins,sans-serif;
+font-weight:500;
+cursor:pointer;
+box-shadow:0 8px 25px rgba(0,0,0,0.3);
+z-index:9999;
+transition:all 0.3s ease;
+animation:pulse 2s infinite;
+}
+
+#polyAiBtn:hover{
+transform:scale(1.08);
+box-shadow:0 12px 30px rgba(0,0,0,0.4);
+}
+
+#polyAiBtn span{
+white-space:nowrap;
+}
+
+@keyframes pulse{
+0%{box-shadow:0 0 0 0 rgba(0,114,255,0.7);}
+70%{box-shadow:0 0 0 15px rgba(0,114,255,0);}
+100%{box-shadow:0 0 0 0 rgba(0,114,255,0);}
+}
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #ffffff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+    border-top: 1px solid #eee;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: #777;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: 0.3s;
+}
+
+.nav-item i {
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+
+.nav-item.active {
+    color: #1E4DB7;
+    font-weight: 600;
+}
+
+.nav-item:hover {
+    color: #1E4DB7;
+}
+.p-card{
+
+  font-size: 22px;
+  font-weight: 600;
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  letter-spacing: 1px;
+  margin-top: 10px;
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+@keyframes fadeIn{
+  from{
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to{
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.banner-wrapper{
+max-width:1200px;
+margin:20px auto;
+padding:0 15px;
+overflow:hidden;
+position:relative;
+}
+
+.banner-slider{
+display:flex;
+transition:transform 0.6s ease-in-out;
+}
+
+.banner-slide{
+min-width:100%;
+position:relative;
+}
+
+.banner-slide img{
+width:100%;
+height:350px;
+object-fit:cover;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* Animation fade overlay */
+.banner-slide::after{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+border-radius:15px;
+background:linear-gradient(to bottom,rgba(0,0,0,0.1),rgba(0,0,0,0.3));
+}
+
+/* Mobile */
+@media(max-width:768px){
+.banner-slide img{
+height:180px;
+}
+}
+</style>
+</head>
+
+<body>
+
+
+<div id="polyAiBtn" onclick="openAI()">
+🤖 <span>AI Mentor</span>
+</div>
+
+
+<!-- ===== POLYACADEMY AI FLOATING BUTTON END ===== -->
+<header class="top-header">
+
+  <div class="logo-container">
+    <img src="logo.png" alt="Poly Academy Logo">
+    <h1>Poly Academy</h1>
+      </div>
+
+</header>
+<!-- NAVBAR -->
+   <div class="p-card">
+   <p>Learn Engineering the Practical Way. </p> </div>
+ 
+
+<div class="view-card">
+  👁️ Total Visitors: <span id="viewCount">0</span>
+</div>
+
+<div class="banner-wrapper">
+  <div id="bannerSlider" class="banner-slider"></div>
+</div>
+<a href="https://whatsapp.com/channel/0029Vb71C4q5vKA0l3ACYx3M"
+   target="_blank"
+   class="wa-channel-btn">
+   📢 Join WhatsApp Channel
+</a>
+<!-- Notice Button -->
+
+<head><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6313664443076686"
+     crossorigin="anonymous"></script></head>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+  <div class="cards">
+
+<div class="card">
+      <h1>📘 Semester Notes</h1>
+      <p>Branch & semester wise subject notes and PDFs.</p>
+      <a href="notes.html"> Download All Semester Notes</a>
+    </div>
+    
+    <div class="card">
+    <h1>💊 D. Pharma</h1>
+    <p>D. Pharma ke complete notes, syllabus, exams aur career guidance ek hi jagah.</p>
+    <a href="dpharma.html">Explore D. Pharma</a>
+    </div>
+    <div class="card">
+    <h1>JEECUP Mock Test</h1>
+    <p>Practice Computer Based Test (CBT) pattern with real exam environment.</p>
+    <a href="mock-tests.html">Start Mock Test</a>
+    </div>
+    <div class="card">
+      <h1>🎯 Entrance Exam</h1>
+      <p>Syllabus, previous year questions, PDFs and preparation guides.</p>
+      <a href="entrance.html">Download Entrance Exam Notes</a>
+    </div>
+    <div class="card">
+    <h1>Board Exam Notes</h1>
+    <p>Download subject-wise notes, important questions and study materials.</p>
+    <a href="board.html">View Notes</a>
+    </div>
+    <div class="card">
+    <h1>Mistake Recovery Guide</h1>
+    <p>Any mistake in councilling,then follow it's step.</p>
+    <a href="guide.html">Explore Guide</a>
+    </div>
+    <div class="card">
+    <h1>👨‍🏫 Mentor Connect</h1>
+    <p>
+    Get direct guidance from verified mentors of your college & branch.  
+    <br>अपने कॉलेज और ब्रांच के मेंटर्स से सीधे मार्गदर्शन लें।
+    </p>
+    <a href="mentor.html">Find Mentor</a>
+    </div>
+
+<div class="card">
+  <h1>📊 Cutoff Based College Pridictor</h1>
+  <p>Check college and branch based on your rank and category.</p>
+  <p><small>📌 Based on previous year counselling data</small></p>
+  <a href="cutoffs.html">Check College </a>
+</div>
+
+<div class="card">
+  <h1>🧠 Counselling & Study Tips</h1>
+  <p>
+    Smart tips for admission, counselling & exams.  
+    <br>एडमिशन, काउंसलिंग और पढ़ाई के लिए उपयोगी टिप्स।
+  </p>
+  <a href="tips.html">Read Tips</a>
+</div>
+
+    <div class="card">
+    <h1>📘 Study Planner</h1>
+    <p>Create your study plane and time table smartly.</p>
+    <a href="planner.html">Study Planner</a>
+    </div>
+    
+    <div class="card">
+    <h1>📘 Career Suggestions</h1>
+    <p>Top guidance For You</p>
+    <a href="career.html">Career Suggestions</a>
+    </div>
+    
+    <div class="card">
+    <h1>Progress Bar</h1>
+    <p>Improve your study time and make effective with advance features.</p>
+    <a href="progress.html">See your Progress</a>
+    </div>
+    
+    <div class="card">
+    <h1>📘 Help Section</h1>
+    <p>Go to Help Center for Common Question</p>
+    <a href="faq.html">Help Center</a>
+    </div>
+    
+
+    <div class="card">
+      <h1>ℹ️ About Us</h1>
+      <p>Know about our mission, vision and educational goal.</p>
+      <a href="about.html">Read More</a>
+    </div>
+
+    <div class="card">
+      <h1>📞 Contact Us</h1>
+      <p>Have questions or need notes? Reach us easily.</p>
+      <a href="contact.html">Contact</a>
+    </div>
+    <section class="feedback-section">
+    <h2>⭐ Student Feedback</h2>
+    
+    <form id="feedbackForm">
+    <input type="text" id="name" placeholder="Your Name" required>
+    <select id="rating" required>
+    <option value="">Rating</option>
+    <option value="5">⭐⭐⭐⭐⭐</option>
+    <option value="4">⭐⭐⭐⭐</option>
+    <option value="3">⭐⭐⭐</option>
+    <option value="2">⭐⭐</option>
+    <option value="1">⭐</option>
+    
+    </select>
+    <textarea id="message" placeholder="Your feedback..." required></textarea>
+    <button type="submit">Submit Feedback</button>
+    </form>
+    
+    <div id="feedbackList"></div>
+    </section>
+    <button class="share-btn" onclick="shareWebsite()">
+    🔗 Share Website
+    </button>
+<a href="privacy.html" style="color:#64748b;text-decoration:none;">
+  Privacy Policy
+</a>
+  </div>
+</div>
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="bottom-nav">
+    <a href="index.html" class="nav-item active">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+    </a>
+
+    <a href="notes.html" class="nav-item">
+        <i class="fa-solid fa-book-open"></i>
+        <span>poly notes</span>
+    </a>
+
+    <a href="mentor.html" class="nav-item">
+        <i class="fa-solid fa-chalkboard-user"></i>
+        <span>Mentors</span>
+    </a>
+<a href="dpharma.html" class="nav-item">
+        <i class="fa-solid fa-book-open"></i>
+        <span>dpharma</span>
+    </a>
+    <a href="entrance.html" class="nav-item">
+        <i class="fa-solid fa-users"></i>
+        <span>Entrance</span>
+    </a>
+<a href="notice.html" class="nav-item">
+        <i class="fa-solid fa-bell"></i>
+        <span>Notices</span>
+    </a>
+    <a href="profile.html" class="nav-item">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
+    </a>
+</div>
+
+<footer>
+  © 2026 Poly Academy • Student Learning Platform
+</footer>
+<script>
+function shareWebsite(){
+  const siteUrl = "https://polyacademy.netlify.app/";
+
+  if(navigator.share){
+    navigator.share({
+      title: "Polytechnic Notes",
+      text: "Free Polytechnic Notes and Study Materials",
+      url: siteUrl
+    });
+  } else {
+    navigator.clipboard.writeText(siteUrl);
+    alert("Website link copied!");
+  }
+}
+</script>
+<script type="module">
+  // 🔹 Firebase core
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+
+  // 🔹 Realtime Database
+  import { 
+    getDatabase, 
+    ref, 
+    runTransaction, 
+    onValue 
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+  // 🔹 Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+    authDomain: "hpresult-612a4.firebaseapp.com",
+    databaseURL: "https://hpresult-612a4-default-rtdb.firebaseio.com",
+    projectId: "hpresult-612a4",
+    storageBucket: "hpresult-612a4.appspot.com",
+    messagingSenderId: "938318154272",
+    appId: "1:938318154272:web:f55d536591e673b03d8a45"
+  };
+
+  // 🔹 Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // 🔹 View Counter Reference
+  const viewRef = ref(db, "views/index");
+
+  // 🔹 Increment Visitor Count
+  runTransaction(viewRef, (current) => {
+    return (current || 0) + 1;
+  });
+
+  // 🔹 Live View Count Listener
+  onValue(viewRef, (snapshot) => {
+    document.getElementById("viewCount").innerText = snapshot.val() || 0;
+  });
+</script>
+<script type="module">
+import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } 
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+const db = getFirestore();
+
+/* Submit Feedback */
+const form = document.getElementById("feedbackForm");
+const list = document.getElementById("feedbackList");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById("name").value.trim();
+  const rating = document.getElementById("rating").value;
+  const message = document.getElementById("message").value.trim();
+
+  if (!name || !rating || !message) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  await addDoc(collection(db, "feedback"), {
+    name,
+    rating,
+    message,
+    time: serverTimestamp()
+  });
+
+  form.reset();
+});
+
+/* Live Feedback Show */
+onSnapshot(collection(db, "feedback"), (snapshot) => {
+  list.innerHTML = "";
+  snapshot.forEach(doc => {
+    const d = doc.data();
+    list.innerHTML += `
+      <div class="feedback-card">
+        <strong>${d.name}</strong> ⭐${d.rating}<br>
+        <small>${d.message}</small>
+      </div>
+    `;
+  });
+});
+</script>
+
+<script>
+function openAI(){
+window.location.href="ai-mentor.html"; 
+}
+</script>
+<script type="module">
+
+
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+    authDomain: "hpresult-612a4.firebaseapp.com",
+    databaseURL: "https://hpresult-612a4-default-rtdb.firebaseio.com",
+    projectId: "hpresult-612a4",
+    storageBucket: "hpresult-612a4.appspot.com",
+    messagingSenderId: "938318154272",
+    appId: "1:938318154272:web:f55d536591e673b03d8a45"
+  };
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+let currentSlide=0;
+
+async function loadBanners(){
+
+const q=query(collection(db,"banners"),where("isActive","==",true));
+const snapshot=await getDocs(q);
+
+const slider=document.getElementById("bannerSlider");
+slider.innerHTML="";
+
+snapshot.forEach(doc=>{
+const b=doc.data();
+
+/* 🔥 Skip blank image */
+if(!b.imageUrl || b.imageUrl.trim()==="") return;
+
+slider.innerHTML+=`
+<div class="banner-slide">
+<a href="${b.link || '#'}" target="_blank">
+<img src="${b.imageUrl}">
+</a>
+</div>
+`;
+});
+
+startSlider();
+}
+
+function startSlider(){
+
+const slides=document.querySelectorAll(".banner-slide");
+if(slides.length <= 1) return;  // no blank movement
+
+setInterval(()=>{
+currentSlide++;
+if(currentSlide >= slides.length){
+currentSlide = 0;
+}
+document.getElementById("bannerSlider").style.transform=
+`translateX(-${currentSlide*100}%)`;
+},4000);
+
+}
+
+loadBanners();
+
+</script>
+</body>
+</html>html>

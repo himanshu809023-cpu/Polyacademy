@@ -1,0 +1,158 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login</title>
+<style>
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:linear-gradient(135deg,#020617,#0f172a);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+}
+.login-box{
+  width:100%;
+  max-width:380px;
+  background:#020617;
+  padding:30px;
+  border-radius:16px;
+  box-shadow:0 20px 40px rgba(0,0,0,.45);
+}
+.login-box h2{
+  text-align:center;
+  margin-bottom:20px;
+}
+input{
+  width:100%;
+  padding:12px;
+  margin-bottom:14px;
+  border:none;
+  border-radius:10px;
+  font-size:15px;
+}
+button{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+  font-weight:700;
+  background:#2563eb;
+  color:#fff;
+  cursor:pointer;
+}
+button:hover{opacity:.9}
+.note{
+  font-size:12px;
+  text-align:center;
+  opacity:.75;
+  margin-top:10px;
+}
+</style>
+</head>
+<body><div class="login-box">
+  <h2>🔐 Admin Login</h2>
+  <input type="email" id="email" placeholder="Admin Email">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <div class="note">Authorized admins only</div>
+</div><script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// 🔥 FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// 🚀 LOGIN + ROLE BASED REDIRECT
+window.login = async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if(!email || !password){
+    alert("Enter email & password");
+    return;
+  }
+
+  try{
+    const res = await signInWithEmailAndPassword(auth,email,password);
+    const uid = res.user.uid;
+
+    const snap = await getDoc(doc(db,"admins",uid));
+
+    if(!snap.exists()){
+      alert("You are not authorized as admin");
+      return;
+    }
+
+    const data = snap.data();
+
+    if(data.banned === true){
+      alert("Your admin access is blocked");
+      return;
+    }
+
+    // 🔁 SMART REDIRECT BASED ON ACCESS
+    switch(data.access){
+      case "mentor":
+        location.href = "admin-mentor.html";
+        break;
+      case "dpharma":
+        location.href = "admin-dpharma.html";
+        break;
+      case "entrance":
+        location.href = "admin-entrance.html";
+        break;
+        case "career":
+        location.href = "admin-career.html";
+        break;
+        
+        case "notes":
+        location.href = "admin-notes.html";
+        
+        break;
+        case "cutoffs":
+        location.href = "admin-cutoffs.html";
+        break;
+        
+        case "test":
+        location.href = "admin-test.html";
+        break;
+        
+        case "board":
+        location.href = "admin-board.html";
+        break;
+        
+        case "notice":
+        location.href = "admin-notice.html";
+        
+        break;
+        case "admin":
+        location.href = "admin-dashboard.html";
+        break;
+      default:
+        location.href = "admin-dashboard.html";
+    }
+
+  }catch(err){
+    alert(err.message);
+  }
+};
+</script></body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin – Notice Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  font-family:Arial;
+  background:#f1f5f9;
+  margin:0;
+  padding:0;
+}
+
+header{
+  background:#1E40AF;
+  color:#fff;
+  padding:15px;
+  text-align:center;
+  font-weight:bold;
+  font-size:18px;
+}
+
+.container{
+  max-width:600px;
+  margin:20px auto;
+  background:#fff;
+  padding:20px;
+  border-radius:8px;
+}
+
+input, textarea, select{
+  width:100%;
+  padding:8px;
+  margin:6px 0;
+  border:1px solid #cbd5e1;
+  border-radius:6px;
+  box-sizing:border-box;
+}
+
+button{
+  padding:10px 14px;
+  margin-top:10px;
+  background:#2563EB;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.notice-list{
+  margin-top:20px;
+}
+
+.notice-item{
+  background:#f1f5f9;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:6px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.notice-item span{
+  display:block;
+}
+
+.notice-item .buttons button{
+  background:#dc2626;
+  margin-left:6px;
+  padding:4px 8px;
+  font-size:12px;
+}
+
+label{
+  font-weight:bold;
+  font-size:14px;
+}
+header{
+  background:#1E40AF;
+  color:#fff;
+  padding:10px 15px;
+}
+
+.nav-container{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.logo{
+  font-weight:bold;
+  font-size:18px;
+}
+
+nav a{
+  color:#fff;
+  text-decoration:none;
+  margin-left:15px;
+  padding:6px 10px;
+  border-radius:6px;
+  transition:0.2s;
+  font-size:14px;
+}
+
+nav a:hover{
+  background:#2563EB;
+}
+</style>
+</head>
+
+<body>
+
+<header>🔐 Admin Notice Panel</header>
+<header>
+  <div class="nav-container">
+    <span class="logo">📢 Polytechnic Notices</span>
+    <nav>
+    <a href="notice.html">Notice</a>
+    
+      <a href="index.html">Home</a>
+      <a href="entrance.html">Entrance</a>
+      <a href="semester.html">Semester</a>
+      <a href="studyplanner.html">Study Planner</a>
+      <a href="contact.html">Contact</a>
+      <a href="about.html">About Us</a>
+      <a href="privacy.html">Privacy Policy</a>
+    </nav>
+  </div>
+</header>
+<div class="container">
+  <label>Notice Title</label>
+  <input type="text" id="title" placeholder="Enter title">
+
+  <label>Notice Message</label>
+  <textarea id="message" placeholder="Enter message"></textarea>
+
+  <label>Category</label>
+  <select id="category">
+    <option>Exam</option>
+    <option>Result</option>
+    <option>General</option>
+  </select>
+
+  <label>Important</label>
+  <select id="important">
+    <option value="false">No</option>
+    <option value="true">Yes</option>
+  </select>
+<label>Page / Form Link (optional)</label>
+<input type="text" id="pageLink" placeholder="https://example.com/page">
+  <label>Expire After (days, optional)</label>
+  <input type="number" id="expireDays" placeholder="e.g., 7">
+
+  <button onclick="addNotice()">Add Notice</button>
+
+  <div class="notice-list" id="noticeList"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const noticeList = document.getElementById("noticeList");
+
+async function loadNotices(){
+  noticeList.innerHTML="";
+  const snap = await getDocs(collection(db,"entrance_notices"));
+  snap.forEach(d=>{
+    const data = d.data();
+    const id = d.id;
+    const expireDate = data.expireAt ? new Date(data.expireAt).toLocaleDateString() : "N/A";
+
+    noticeList.innerHTML += `
+      <div class="notice-item">
+        <span>
+          <b>${data.title}</b> [${data.category}] ${data.important=="true"?"⭐":" "}
+          <br>${data.message}
+          <small>${data.pageLink}
+          <small>🕒 ${data.time}</small>
+          <small>Expires: ${expireDate}</small>
+        </span>
+        <div class="buttons">
+          <button onclick="deleteNotice('${id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+window.addNotice = async()=>{
+  const title = document.getElementById("title").value;
+  const message = document.getElementById("message").value;
+  const category = document.getElementById("category").value;
+  const important = document.getElementById("important").value;
+  const pagelink = document.getElementById("pageLink").value="";
+  
+  const expireDays = parseInt(document.getElementById("expireDays").value);
+
+  if(!title || !message) return alert("Fill all fields");
+
+  let expireAt = null;
+  if(expireDays && expireDays>0){
+    expireAt = Date.now() + expireDays*24*60*60*1000;
+  }
+
+  await addDoc(collection(db,"entrance_notices"),{
+    title,
+    message,
+    category,
+    important,
+    pageLink,
+    time: new Date().toLocaleString(),
+    createdAt: Date.now(),
+    expireAt
+  });
+
+  document.getElementById("title").value="";
+  document.getElementById("message").value="";
+  document.getElementById("pageLink").value="";
+  
+  document.getElementById("expireDays").value="";
+
+  loadNotices();
+};
+
+window.deleteNotice = async(id)=>{
+  if(confirm("Delete this notice?")){
+    await deleteDoc(doc(db,"entrance_notices",id));
+    loadNotices();
+  }
+};
+
+loadNotices();
+</script>
+
+</body>
+</html>

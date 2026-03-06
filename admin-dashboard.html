@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin:0; padding:0; font-family: 'Inter', sans-serif; }
+    body { background: #f5f7fa; color: #333; }
+    header {
+      text-align: center;
+      padding: 40px 20px 20px 20px;
+      background: linear-gradient(90deg, #4b6cb7, #182848);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    header h1 { font-size: 2.2rem; }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+      text-decoration: none;
+      color: #333;
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    .card i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: #4b6cb7;
+      transition: color 0.3s;
+    }
+
+    .card:hover i { color: #182848; }
+
+    .card span {
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: rgba(75,108,183,0.1);
+      transform: rotate(45deg);
+      transition: all 0.5s;
+    }
+
+    .card:hover::after { top: -30%; left: -30%; }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Admin Dashboard</h1>
+  </header>
+
+  <div class="container">
+  
+  <a href="admin-notes.html" class="card">
+      <i class="fas fa-copy"></i>
+      <span>Notes Admin</span>
+    </a>
+  <a href="admin-test.html" class="card">
+  <i class="fas fa-percent"></i>
+  <span>Test Admin</span>
+  </a>
+  
+  <a href="admin-board.html" class="card">
+  <i class="fas fa-board"></i>
+  <span>Board Admin</span>
+  </a>
+  
+    <a href="admin-mentor.html" class="card">
+      <i class="fas fa-chalkboard-teacher"></i>
+      <span>Mentor Admin</span>
+    </a>
+    <a href="admin-entrance.html" class="card">
+      <i class="fas fa-clipboard-list"></i>
+      <span>Entrance Admin</span>
+    </a>
+    <a href="admin-cutoffs.html" class="card">
+      <i class="fas fa-percent"></i>
+      <span>Cutoffs Admin</span>
+    </a>
+ 
+    
+    <a href="admin-notice.html" class="card">
+      <i class="fas fa-bell"></i>
+      <span>Notice Admin</span>
+    </a>
+    
+    <a href="admin-career.html" class="card">
+    <i class="fas fa-copy"></i>
+    <span>Career Admin</span>
+    </a>
+    
+    <a href="admin-dpharma.html" class="card">
+      <i class="fas fa-pills"></i>
+      <span>D Pharma Admin</span>
+    </a>
+    <a href="admin-student.html" class="card">
+      <i class="fas fa-user-graduate"></i>
+      <span>Student Admin</span>
+    </a>
+    <a href="admin-settings.html" class="card">
+      <i class="fas fa-cogs"></i>
+      <span>Settings</span>
+    </a>
+  </div>
+
+</body>
+</html>

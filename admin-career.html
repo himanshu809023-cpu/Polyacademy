@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin – Career & Guidance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#f1f5f9;
+  margin:0;
+}
+
+header{
+  background:#1E40AF;
+  color:#fff;
+  padding:15px;
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.container{
+  max-width:1100px;
+  margin:20px auto;
+  padding:10px;
+}
+
+.form-card{
+  background:#fff;
+  padding:15px;
+  border-radius:10px;
+  box-shadow:0 3px 8px rgba(0,0,0,0.1);
+  margin-bottom:20px;
+}
+
+.form-card h3{
+  margin-top:0;
+  color:#1E40AF;
+}
+
+input, textarea{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  border-radius:6px;
+  border:1px solid #cbd5e1;
+  font-size:14px;
+}
+
+button{
+  padding:10px 15px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.btn-add{
+  background:#1E40AF;
+  color:#fff;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+  gap:15px;
+}
+
+.card{
+  background:#fff;
+  padding:15px;
+  border-radius:10px;
+  box-shadow:0 3px 8px rgba(0,0,0,0.1);
+}
+
+.card h4{
+  margin:0;
+  color:#1E40AF;
+}
+
+.card p{
+  font-size:14px;
+  color:#374151;
+}
+
+.card a{
+  color:#2563EB;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+.card .actions{
+  margin-top:10px;
+}
+
+.btn-del{
+  background:#dc2626;
+  color:#fff;
+}
+
+.btn-edit{
+  background:#16a34a;
+  color:#fff;
+  margin-right:5px;
+}
+</style>
+</head>
+
+<body>
+
+<header>🔐 Admin Panel – Career & Guidance</header>
+
+<div class="container">
+
+  <!-- ADD / UPDATE FORM -->
+  <div class="form-card">
+    <h3>Add / Update Career Resource</h3>
+    <input id="title" placeholder="Title (e.g. Internship for Mechanical)">
+    <textarea id="description" rows="3" placeholder="Short description"></textarea>
+    <input id="link" placeholder="PDF / Website Link (optional)">
+    <button class="btn-add" onclick="saveResource()">Save Resource</button>
+  </div>
+
+  <!-- CARDS -->
+  <div class="cards" id="cards"></div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, updateDoc, serverTimestamp } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const cardsDiv = document.getElementById("cards");
+
+let editId = null;
+
+window.saveResource = async () => {
+  const title = document.getElementById("title").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const link = document.getElementById("link").value.trim();
+
+  if(!title || !description){
+    alert("Title and description required");
+    return;
+  }
+
+  if(editId){
+    await updateDoc(doc(db,"career_resources",editId),{
+      title, description, link
+    });
+    editId = null;
+  } else {
+    await addDoc(collection(db,"career_resources"),{
+      title,
+      description,
+      link,
+      createdAt: serverTimestamp()
+    });
+  }
+
+  document.getElementById("title").value="";
+  document.getElementById("description").value="";
+  document.getElementById("link").value="";
+};
+
+onSnapshot(collection(db,"career_resources"), snapshot=>{
+  let html="";
+  snapshot.forEach(docSnap=>{
+    const d = docSnap.data();
+    html+=`
+      <div class="card">
+        <h4>${d.title}</h4>
+        <p>${d.description}</p>
+        ${d.link ? `<a href="${d.link}" target="_blank">Open Link</a>` : ""}
+        <div class="actions">
+          <button class="btn-edit" onclick="editResource('${docSnap.id}','${d.title}','${d.description}','${d.link || ""}')">Edit</button>
+          <button class="btn-del" onclick="deleteResource('${docSnap.id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  });
+  cardsDiv.innerHTML = html;
+});
+
+window.deleteResource = async (id)=>{
+  if(confirm("Delete this resource?")){
+    await deleteDoc(doc(db,"career_resources",id));
+  }
+}
+
+window.editResource = (id,title,desc,link)=>{
+  document.getElementById("title").value = title;
+  document.getElementById("description").value = desc;
+  document.getElementById("link").value = link;
+  editId = id;
+}
+</script>
+
+</body>
+</html>

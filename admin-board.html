@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Upload – PolyAcademy</title>
+
+<style>
+:root{
+  --primary:#1e40af;
+  --bg:#f1f5f9;
+}
+
+body{
+  margin:0;
+  font-family:Segoe UI,Arial;
+  background:var(--bg);
+}
+
+header{
+  background:var(--primary);
+  color:white;
+  padding:20px;
+  text-align:center;
+}
+
+.container{
+  max-width:900px;
+  margin:30px auto;
+  padding:20px;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+  margin-bottom:20px;
+}
+
+h2{
+  margin-top:0;
+  color:var(--primary);
+}
+
+input, select{
+  width:100%;
+  padding:10px;
+  margin-bottom:12px;
+  border-radius:8px;
+  border:1px solid #cbd5e1;
+}
+
+button{
+  padding:8px 14px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:600;
+  margin-right:5px;
+}
+
+.primary{
+  background:var(--primary);
+  color:white;
+}
+
+.edit{
+  background:#f59e0b;
+  color:white;
+  font-size:12px;
+}
+
+.delete{
+  background:#dc2626;
+  color:white;
+  font-size:12px;
+}
+
+.material-item{
+  padding:12px;
+  border-bottom:1px solid #e2e8f0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+small{
+  color:#64748b;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Admin – Study Material Upload</h1>
+</header>
+
+<div class="container">
+
+  <!-- Upload Form -->
+  <div class="card">
+    <h2 id="formTitle">Add Study Material</h2>
+
+    <select id="board">
+      <option value="">Select Board</option>
+      <option value="UP">UP Board</option>
+      <option value="CBSE">CBSE Board</option>
+    </select>
+
+    <select id="class">
+      <option value="">Select Class</option>
+      <option value="10">Class 10</option>
+      <option value="12">Class 12</option>
+    </select>
+
+    <select id="type">
+      <option value="">Select Type</option>
+      <option value="Notes">Notes</option>
+      <option value="Previous Year Paper">Previous Year Paper</option>
+    </select>
+
+    <input type="text" id="title" placeholder="Enter Title">
+    <input type="url" id="link" placeholder="Enter PDF / Drive Link">
+
+    <button class="primary" onclick="saveMaterial()" id="saveBtn">Upload</button>
+  </div>
+
+  <!-- Uploaded Data -->
+  <div class="card">
+    <h2>Uploaded Materials</h2>
+    <div id="materialsList"></div>
+  </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let editId = null;
+
+// SAVE / UPDATE FUNCTION
+window.saveMaterial = async function(){
+
+  const board = document.getElementById("board").value;
+  const cls = document.getElementById("class").value;
+  const type = document.getElementById("type").value;
+  const title = document.getElementById("title").value;
+  const link = document.getElementById("link").value;
+
+  if(!board || !cls || !type || !title || !link){
+    alert("Please fill all fields");
+    return;
+  }
+
+  if(editId){
+    await updateDoc(doc(db,"studyMaterials",editId),{
+      board, class:cls, type, title, link
+    });
+    alert("Updated Successfully");
+    editId = null;
+    document.getElementById("formTitle").innerText="Add Study Material";
+    document.getElementById("saveBtn").innerText="Upload";
+  }else{
+    await addDoc(collection(db,"studyMaterials"),{
+      board, class:cls, type, title, link,
+      createdAt: Date.now()
+    });
+    alert("Uploaded Successfully");
+  }
+
+  clearForm();
+};
+
+function clearForm(){
+  document.getElementById("board").value="";
+  document.getElementById("class").value="";
+  document.getElementById("type").value="";
+  document.getElementById("title").value="";
+  document.getElementById("link").value="";
+}
+
+// REALTIME LIST
+const listContainer = document.getElementById("materialsList");
+
+onSnapshot(collection(db,"studyMaterials"),(snapshot)=>{
+  listContainer.innerHTML="";
+  snapshot.forEach(docSnap=>{
+    const data = docSnap.data();
+
+    listContainer.innerHTML += `
+      <div class="material-item">
+        <div>
+          <strong>${data.title}</strong><br>
+          <small>${data.board} | Class ${data.class} | ${data.type}</small>
+        </div>
+        <div>
+          <button class="edit" onclick="editMaterial('${docSnap.id}',
+          '${data.board}','${data.class}','${data.type}',
+          '${data.title}','${data.link}')">Edit</button>
+
+          <button class="delete" onclick="deleteMaterial('${docSnap.id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  });
+});
+
+// DELETE
+window.deleteMaterial = async function(id){
+  await deleteDoc(doc(db,"studyMaterials",id));
+  alert("Deleted Successfully");
+};
+
+// EDIT
+window.editMaterial = function(id,board,cls,type,title,link){
+
+  editId = id;
+
+  document.getElementById("board").value = board;
+  document.getElementById("class").value = cls;
+  document.getElementById("type").value = type;
+  document.getElementById("title").value = title;
+  document.getElementById("link").value = link;
+
+  document.getElementById("formTitle").innerText="Edit Study Material";
+  document.getElementById("saveBtn").innerText="Update";
+
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+
+</script>
+
+</body>
+</html>

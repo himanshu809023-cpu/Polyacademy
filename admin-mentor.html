@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel | Mentors</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;font-family:'Poppins',sans-serif}
+body{margin:0;background:#f4f6f8}
+
+/* HEADER */
+.header{
+  background:#2563eb;color:#fff;padding:20px;text-align:center
+}
+.header h1{margin:0;font-size:22px}
+
+/* CONTAINER */
+.container{max-width:1000px;margin:auto;padding:20px}
+
+/* FORM */
+form{
+  display:grid;gap:12px;background:#fff;padding:15px;
+  border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.08)
+}
+form input,form select{padding:10px;border-radius:8px;border:1px solid #ddd;font-size:14px}
+form button{
+  padding:10px;background:#2563eb;color:#fff;border:none;
+  border-radius:8px;cursor:pointer;font-weight:600
+}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;margin-top:20px;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.08);border-radius:12px;overflow:hidden}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #eee}
+th{background:#1e40af;color:#fff}
+tr:hover{background:#f1f5f9}
+button.action{padding:6px 10px;border:none;border-radius:6px;color:#fff;cursor:pointer}
+button.edit{background:#f59e0b}
+button.delete{background:#dc2626}
+button.toggle{background:#16a34a}
+</style>
+</head>
+
+<body>
+  
+
+<div class="header">
+  <h1>📝 Admin Panel - Mentors</h1>
+</div>
+
+<div class="container">
+  <!-- ADD / EDIT FORM -->
+  <form id="mentorForm">
+    <input type="hidden" id="mentorId">
+        <input id="name" placeholder="Mentor Name" required>
+    <input id="college" placeholder="College" required>
+    <input id="branch" placeholder="Branch" required>
+    <input id="whatsapp" placeholder="WhatsApp Number" required>
+    <input type="text" id="imageUrl" placeholder="Image URL">
+    
+    <label>
+      <input type="checkbox" id="verified"> Verified
+    </label>
+    <button type="submit">Add / Update Mentor</button>
+  </form>
+
+  <!-- MENTOR LIST -->
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>College</th>
+        <th>Branch</th>
+        <th>WhatsApp</th>
+        <th>Image</th>
+        <th>Verified</th>
+        <th>Rating</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="mentorTable"></tbody>
+  </table>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+
+/* DOM */
+const mentorForm = document.getElementById("mentorForm");
+const mentorTable = document.getElementById("mentorTable");
+
+let mentors = [];
+
+/* LOAD MENTORS */
+onSnapshot(collection(db,"mentors"), snap=>{
+  mentors=[];
+  mentorTable.innerHTML="";
+  snap.forEach(d=>{
+    const m=d.data(); m.id=d.id; mentors.push(m);
+    const avg = m.ratingCount ? (m.rating/m.ratingCount).toFixed(1) : "New";
+    mentorTable.innerHTML+=`
+      <tr>
+        <td>${m.name}</td>
+        <td>${m.college}</td>
+        <td>${m.branch}</td>
+        <td>${m.whatsapp}</td>
+        <td>${m.imageUrl}</td>
+        <td>${m.verified?'✔':'❌'}</td>
+        <td>${avg}</td>
+        <td>
+          <button class="action edit" onclick="editMentor('${m.id}')">Edit</button>
+          <button class="action delete" onclick="deleteMentor('${m.id}')">Delete</button>
+          <button class="action toggle" onclick="toggleVerified('${m.id}',${m.verified})">Toggle Verified</button>
+        </td>
+      </tr>`;
+  });
+});
+
+/* ADD / UPDATE */
+mentorForm.addEventListener("submit", async e=>{
+  e.preventDefault();
+  const id = document.getElementById("mentorId").value;
+  const data={
+    name: document.getElementById("name").value,
+    college: document.getElementById("college").value,
+    branch: document.getElementById("branch").value,
+    whatsapp: document.getElementById("whatsapp").value,
+    image: document.getElementById("imageUrl").value,
+    verified: document.getElementById("verified").checked
+  };
+
+  if(id){
+    await updateDoc(doc(db,"mentors",id), data);
+    alert("Mentor updated!");
+  } else {
+    await addDoc(collection(db,"mentors"), {...data,rating:0,ratingCount:0});
+    alert("Mentor added!");
+  }
+
+  mentorForm.reset();
+  document.getElementById("mentorId").value="";
+});
+
+/* EDIT */
+window.editMentor=(id)=>{
+  const m=mentors.find(x=>x.id===id);
+  document.getElementById("mentorId").value=m.id;
+  document.getElementById("name").value=m.name;
+  document.getElementById("college").value=m.college;
+  document.getElementById("branch").value=m.branch;
+  document.getElementById("whatsapp").value=m.whatsapp;
+  image: document.getElementById("imageUrl").value=m.imageUrl;
+  
+  document.getElementById("verified").checked=m.verified;
+};
+
+/* DELETE */
+window.deleteMentor=async(id)=>{
+  if(confirm("Delete mentor?")) await deleteDoc(doc(db,"mentors",id));
+};
+
+/* TOGGLE VERIFIED */
+window.toggleVerified=async(id,current)=>{
+  await updateDoc(doc(db,"mentors",id),{verified:!current});
+};
+</script>
+<script type="module">
+
+/* 🔐 HARD BLOCK DIRECT ACCESS */
+onAuthStateChanged(auth, async(user)=>{
+  if(!user){
+    location.replace("admin-login.html");
+    return;
+  }
+
+  const snap = await getDoc(doc(db,"admins",user.uid));
+
+  if(!snap.exists()){
+    location.replace("admin-login.html");
+    return;
+  }
+
+  if(snap.data().banned === true){
+    alert("Access blocked");
+    location.replace("admin-login.html");
+    return;
+  }
+
+  // ✅ AUTHORIZED → PAGE LOAD
+  document.body.style.display = "block";
+});
+</script>
+</body>
+</html>

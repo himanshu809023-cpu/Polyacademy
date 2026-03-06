@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Official Result & Certificate</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#eef2ff;
+}
+
+.header{
+  background:#1e3a8a;
+  color:white;
+  padding:18px;
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+}
+
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:20px;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.1);
+  margin-bottom:20px;
+}
+
+button{
+  padding:10px 18px;
+  background:#2563eb;
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+#certificate{
+  display:none;
+  margin-top:20px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">PolyAcademy Examination Board</div>
+
+<div class="container">
+
+<div class="card">
+<h2>Result Details</h2>
+
+<p><b>Name:</b> <span id="name"></span></p>
+
+<p><b>Test:</b> <span id="test"></span></p>
+<p><b>Total Marks:</b> <span id="total"></span></p>
+<p><b>Obtained Marks:</b> <span id="score"></span></p>
+<p><b>Percentage:</b> <span id="percent"></span>%</p>
+<p><b>Status:</b> <span id="status"></span></p>
+<p><b>Division:</b> <span id="division"></span></p>
+
+<button onclick="generateCertificate()">Generate Official Certificate</button>
+</div>
+
+<div id="certificate"></div>
+
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<!-- PDF & QR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+
+var firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
+
+let resultData = {};
+let certificateId = "";
+
+// 🔹 Load Result Using RollNo (stored during login)
+let rollNo = localStorage.getItem("rollNo");
+
+db.collection("results")
+.where("rollNo","==",rollNo)
+.limit(1)
+.get()
+.then(snapshot=>{
+  snapshot.forEach(doc=>{
+    resultData = doc.data();
+
+    name.innerText = resultData.studentName;
+    roll.innerText = resultData.rollNo;
+    test.innerText = resultData.testName;
+    total.innerText = resultData.totalMarks;
+    score.innerText = resultData.obtainedMarks;
+
+    let percentVal = ((resultData.obtainedMarks/resultData.totalMarks)*100).toFixed(2);
+    percent.innerText = percentVal;
+
+    let statusVal = percentVal >= 33 ? "PASS" : "FAIL";
+    status.innerText = statusVal;
+
+    let divisionVal = "Fail";
+    if(percentVal >= 60) divisionVal = "First Division";
+    else if(percentVal >=45) divisionVal = "Second Division";
+    else if(percentVal >=33) divisionVal = "Third Division";
+
+    division.innerText = divisionVal;
+  });
+});
+
+
+// 🔥 GENERATE GOVERNMENT STYLE CERTIFICATE
+function generateCertificate(){
+
+  let percentVal = parseFloat(percent.innerText);
+
+  if(percentVal < 33){
+    alert("Certificate available only for PASS candidates.");
+    return;
+  }
+
+  certificateId = "PA-GOV-" + Date.now();
+
+  let divisionVal = division.innerText;
+
+  // Save in Firestore
+  db.collection("certificates").doc(certificateId).set({
+    certificateId:certificateId,
+    studentName:resultData.studentName,
+    rollNo:resultData.rollNo,
+    testName:resultData.testName,
+    percentage:percentVal,
+    division:divisionVal,
+    issueDate:new Date()
+  });
+
+  let verifyURL = window.location.origin + "/verify.html?id=" + certificateId;
+
+  let certHTML = `
+  <div id="certBox" style="
+    width:900px;
+    padding:60px;
+    border:15px double #1e3a8a;
+    background:white;
+    text-align:center;
+    font-family:'Times New Roman', serif;
+    position:relative;
+  ">
+
+  <!-- Watermark -->
+  <div style="
+    position:absolute;
+    top:45%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-size:100px;
+    color:rgba(30,58,138,0.06);
+    font-weight:bold;
+  ">
+    POLYACADEMY
+  </div>
+
+  <img src="logo.png" width="100"><br><br>
+
+  <h2 style="margin:0;">Government Recognized Examination Authority</h2>
+  <h1 style="color:#1e3a8a;margin:10px 0;">Certificate of Merit</h1>
+  <hr>
+
+  <p>This is to certify that</p>
+
+  <h2>${resultData.studentName}</h2>
+
+  <p>Roll Number: <b>${resultData.rollNo}</b></p>
+
+  <p>has successfully passed the examination</p>
+
+  <h3>${resultData.testName}</h3>
+
+  <p>with <b>${percentVal}%</b> marks</p>
+  <p><b>${divisionVal}</b></p>
+
+  <p>Certificate No: <b>${certificateId}</b></p>
+  <p>Date of Issue: ${new Date().toLocaleDateString()}</p>
+
+  <div id="qrcode" style="margin-top:20px;"></div>
+
+  <br><br><br>
+
+  <div style="display:flex;justify-content:space-between;margin-top:50px;">
+      <div>
+          _____________________<br>
+          Examination Controller
+      </div>
+      <div>
+          <img src="sign.png" width="120"><br>
+          Authorized Signatory
+      </div>
+  </div>
+
+  </div>
+
+  <br>
+  <button onclick="downloadPDF()">Download Official Certificate (PDF)</button>
+  `;
+
+  certificate.innerHTML = certHTML;
+  certificate.style.display="block";
+
+  new QRCode(document.getElementById("qrcode"), verifyURL);
+}
+
+
+// 🔹 Download PDF
+function downloadPDF(){
+  html2pdf().from(document.getElementById("certBox")).save("Official-Certificate.pdf");
+}
+
+</script>
+
+</body>
+</html>

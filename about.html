@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Poly Academy - Study resources and notes for polytechnic students. Learn smart, simple, and effective.">
+  <title>About Us - Poly Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #f0f4f8;
+      color: #333;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #007bff, #00c6ff);
+      color: white;
+      text-align: center;
+      padding: 70px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      margin: 0;
+      animation: fadeInDown 1s ease forwards;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      margin-top: 15px;
+      animation: fadeInUp 1s ease forwards;
+      animation-delay: 0.5s;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Navigation */
+    nav {
+      background-color: #0056b3;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: white;
+      padding: 14px 20px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      background-color: #003d80;
+      border-radius: 5px;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      text-align: center;
+      color: #007bff;
+      font-size: 2.5rem;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 4px;
+      background: #00c6ff;
+      margin: 10px auto 0;
+      border-radius: 2px;
+    }
+
+    /* Cards */
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      padding: 40px 20px;
+      flex: 1 1 300px;
+      max-width: 350px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeCard 0.8s forwards;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.2s; }
+    .card:nth-child(2) { animation-delay: 0.4s; }
+    .card:nth-child(3) { animation-delay: 0.6s; }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 30px rgba(0,0,0,0.15);
+    }
+
+    .card i {
+      font-size: 50px;
+      color: #007bff;
+      margin-bottom: 15px;
+    }
+
+    .card h3 {
+      margin: 15px 0;
+      color: #007bff;
+    }
+
+    .card p {
+      color: #555;
+    }
+
+    @keyframes fadeCard {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      background: linear-gradient(135deg, #007bff, #00c6ff);
+      color: white;
+      margin-top: 40px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .cards {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+    .founder-section{
+    background:#f4f6f9;
+    padding:80px 20px;
+    }
+    
+    .founder-container{
+    max-width:1100px;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    gap:50px;
+    flex-wrap:wrap;
+    }
+    
+    .founder-image img{
+    width:260px;
+    height:260px;
+    object-fit:cover;
+    border-radius:50%;
+    border:6px solid #1e3a8a;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .founder-content{
+    flex:1;
+    }
+    
+    .founder-content h2{
+    color:#1e3a8a;
+    margin-bottom:10px;
+    }
+    
+    .founder-content h3{
+    margin:5px 0;
+    font-size:22px;
+    }
+    
+    .title{
+    color:#f97316;
+    font-weight:bold;
+    margin-bottom:15px;
+    }
+    
+    .founder-content p{
+    line-height:1.6;
+    color:#333;
+    }
+    .top-header{
+    background:#1e3a8a;
+    padding:15px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    }
+    
+    .logo-container{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    }
+    
+    .logo-container img{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid white;
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    .logo-container h2{
+    color:white;
+    margin:0;
+    font-size:22px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <header class="top-header">
+    
+    <div class="logo-container">
+    <img src="logo.png" alt="Poly Academy Logo">
+    <h2>Poly Academy</h2>
+    </div>
+    
+    </header>
+    <p>Learn Smart. Learn Simple. Learn with Poly Academy.</p>
+  </header>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="notes.html">Notes</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+
+  <!-- About Section -->
+  <div class="container">
+    <h2 class="section-title">About Us</h2>
+    <p style="text-align:center; max-width:900px; margin:auto; color:#555; font-size:1.1rem;">
+      Poly Academy is a dedicated platform for polytechnic students, providing <strong>reliable, clear, and exam-focused resources</strong>. We aim to make learning effective, practical, and enjoyable for every student.
+    </p>
+  </div>
+<head><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6313664443076686"
+     crossorigin="anonymous"></script></head>
+  <!-- Cards Section -->
+  <div class="container">
+    <div class="cards">
+      <!-- Mission -->
+      <div class="card">
+        <i class="fas fa-bullseye"></i>
+        <h3>Our Mission</h3>
+        <p>To simplify learning and provide accessible, high-quality resources for polytechnic students, ensuring effective and practical education for all.</p>
+      </div>
+
+      <!-- Vision -->
+      <div class="card">
+        <i class="fas fa-eye"></i>
+        <h3>Our Vision</h3>
+        <p>To become the leading educational platform for polytechnic and technical learners, promoting concept-based learning and student success.</p>
+      </div>
+
+      <!-- Founder -->
+      
+  </div>
+<section class="card">
+
+  <div class="founder-container">
+
+    <div class="founder-image">
+      <img src="founder.png" alt="Founder - Er.Himanshu">
+    </div>
+
+    <div class="founder-content">
+      <h2>Message from the Founder</h2>
+      <h3>Er. Himanshu</h3>
+      <p class="title">Founder, Poly Academy</p>
+
+      <p>
+        Poly Academy was created with a vision to provide quality technical 
+        education and real Computer Based Test experience for Polytechnic students. 
+        Our mission is to help every student succeed in JEECUP and other competitive exams 
+        with structured practice, smart preparation, and real exam simulation.
+      </p>
+
+      <p>
+        We believe in discipline, consistency, and concept clarity. 
+        Let’s build your success together.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+  <!-- Footer -->
+  <footer>
+    &copy; 2026 Poly Academy. All Rights Reserved.
+  </footer>
+
+</body>
+</html>

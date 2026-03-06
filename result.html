@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PolyAcademy Result</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#f1f5f9;}
+header{
+  background:#1e40af;
+  color:white;
+  padding:15px;
+  text-align:center;
+  font-size:18px;
+}
+.container{
+  padding:20px;
+  max-width:800px;
+  margin:auto;
+}
+.card{
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.08);
+  margin-bottom:20px;
+}
+.row{display:flex;justify-content:space-between;margin:6px 0;}
+.pass{color:#15803d;font-weight:bold;}
+.fail{color:#b91c1c;font-weight:bold;}
+button{
+  padding:10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  margin:5px 0;
+}
+.primary{background:#1e40af;color:white;}
+.secondary{background:#64748b;color:white;}
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+th,td{
+  padding:8px;
+  border:1px solid #ddd;
+  font-size:14px;
+}
+.top-header{
+background:#1e3a8a;
+padding:15px 20px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.logo-container{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.logo-container img{
+width:60px;
+height:60px;
+border-radius:50%;
+object-fit:cover;
+border:3px solid white;
+box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+.logo-container h2{
+color:white;
+margin:0;
+font-size:22px;
+}
+</style>
+</head>
+
+<body>
+<header class="top-header">
+
+  <div class="logo-container">
+    <img src="logo.png" alt="Poly Academy Logo">
+    <h2>Poly Academy</h2>
+  </div>
+
+</header>
+<header>PolyAcademy Test Result</header>
+
+<div class="container">
+
+<div class="card" id="scoreCard">Loading...</div>
+
+<div class="card">
+<h3>Leaderboard</h3>
+<table>
+<thead>
+<tr>
+<th>Rank</th>
+<th>Name</th>
+<th>Score</th>
+</tr>
+</thead>
+<tbody id="leaderboard"></tbody>
+</table>
+</div>
+
+<div class="card">
+<h3>Detailed Review</h3>
+<div id="review"></div>
+</div>
+
+<button class="primary" onclick="downloadPDF()">Download PDF</button>
+<button class="secondary" onclick="window.location.href='mock-tests.html'">Back</button>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { 
+  getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+const resultData=JSON.parse(localStorage.getItem("resultData"));
+const questionData=JSON.parse(localStorage.getItem("questionData"));
+const userName=localStorage.getItem("userName")||"Student";
+const testId=localStorage.getItem("selectedTest");
+
+async function saveResult(){
+
+  const percentage=((resultData.score/(resultData.total*4))*100).toFixed(2);
+  const timeTaken=localStorage.getItem("timeTaken")||0;
+
+  await addDoc(collection(db,"results"),{
+    userName,
+    testId,
+    correct:resultData.correct,
+    wrong:resultData.wrong,
+    score:resultData.score,
+    total:resultData.total,
+    percentage,
+    timeTaken,
+    createdAt:serverTimestamp()
+  });
+
+  loadLeaderboard();
+}
+
+async function loadLeaderboard(){
+
+  const q=query(collection(db,"results"),orderBy("score","desc"));
+  const snap=await getDocs(q);
+
+  let rank=1;
+  let html="";
+
+  snap.forEach(doc=>{
+    const d=doc.data();
+    html+=`
+      <tr>
+        <td>${rank++}</td>
+        <td>${d.userName}</td>
+        <td>${d.score}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("leaderboard").innerHTML=html;
+}
+
+function showScoreCard(){
+
+  const percentage=((resultData.score/(resultData.total*4))*100).toFixed(2);
+  const status=percentage>=33?"PASS":"FAIL";
+
+  document.getElementById("scoreCard").innerHTML=`
+    <h3>${testId}</h3>
+    <div class="row"><div>Total</div><div>${resultData.total}</div></div>
+    <div class="row"><div>Correct</div><div>${resultData.correct}</div></div>
+    <div class="row"><div>Wrong</div><div>${resultData.wrong}</div></div>
+    <div class="row"><div>Score</div><div>${resultData.score}</div></div>
+    <div class="row"><div>Percentage</div><div>${percentage}%</div></div>
+    <div class="row"><div>Status</div>
+      <div class="${status==='PASS'?'pass':'fail'}">${status}</div>
+    </div>
+  `;
+}
+
+function showReview(){
+
+  if(!questionData) return;
+
+  let html="";
+
+  questionData.forEach((q,i)=>{
+    html+=`
+      <p><b>Q${i+1}. ${q.question}</b><br>
+      Correct: ${q["option"+q.correct]}</p>
+    `;
+  });
+
+  document.getElementById("review").innerHTML=html;
+}
+
+window.downloadPDF=function(){
+  window.print();
+}
+
+showScoreCard();
+showReview();
+saveResult();
+
+</script>
+
+</body>
+</html>

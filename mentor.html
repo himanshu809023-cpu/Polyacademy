@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mentor Connect | Poly Academy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;font-family:'Poppins',sans-serif}
+body{margin:0;background:#f2f6ff}
+
+/* HEADER */
+.header{
+  background:linear-gradient(135deg,#2563eb,#1e40af);
+  color:#fff;padding:25px 15px;text-align:center;
+  border-bottom-left-radius:25px;border-bottom-right-radius:25px
+}
+.header h1{margin:0;font-size:22px}
+.header p{margin:6px 0 0;font-size:14px;opacity:.9}
+
+/* CONTAINER */
+.container{max-width:1000px;margin:auto;padding:20px}
+
+/* FILTER */
+.filter-box{
+  background:#fff;padding:15px;border-radius:16px;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+  margin-top:-30px
+}
+.filter-grid{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px
+}
+.filter-grid input,.filter-grid select{
+  padding:12px;border-radius:10px;border:1px solid #ddd;font-size:14px
+}
+.toggle{margin-top:10px;font-size:14px}
+
+/* CARD */
+.mentor-card{
+  background:#fff;border-radius:18px;padding:16px;
+  margin-top:16px;box-shadow:0 6px 20px rgba(0,0,0,.08)
+}
+.mentor-top{display:flex;gap:12px;align-items:center}
+.avatar{
+  width:52px;height:52px;border-radius:50%;
+  background:#2563eb;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:600;font-size:18px
+}
+.mentor-info h3{margin:0;font-size:17px}
+.mentor-info small{color:#555}
+.badge{
+  background:#16a34a;color:#fff;
+  padding:3px 8px;border-radius:6px;
+  font-size:11px;margin-left:6px
+}
+.rating{margin-top:5px;color:#f59e0b;font-size:14px}
+.rating span{color:#444;font-size:13px;margin-left:6px}
+
+.whatsapp-btn{
+  display:block;margin-top:12px;padding:12px;
+  text-align:center;background:#25d366;
+  color:#fff;border-radius:12px;
+  text-decoration:none;font-weight:600
+}
+
+/* RATING SUBMIT */
+.rate-box{margin-top:12px;font-size:15px}
+.star{cursor:pointer;color:#d1d5db;font-size:20px}
+.star.active{color:#f59e0b}
+.rate-btn{
+  margin-top:6px;padding:6px 14px;
+  background:#2563eb;color:#fff;
+  border:none;border-radius:8px;cursor:pointer;
+  font-size:13px
+}
+
+.empty{text-align:center;margin-top:20px;color:#777}
+.note{text-align:center;margin-top:25px;font-size:13px;color:#555}
+
+@media(max-width:700px){
+  .filter-grid{grid-template-columns:1fr}
+}
+
+.top-header{
+background:#1e3a8a;
+padding:15px 20px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.logo-container{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.logo-container img{
+width:60px;
+height:60px;
+border-radius:50%;
+object-fit:cover;
+border:3px solid white;
+box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+.logo-container h2{
+color:white;
+margin:0;
+font-size:22px;
+}
+</style>
+</head>
+
+<body>
+<header class="top-header">
+
+  <div class="logo-container">
+    <img src="logo.png" alt="Poly Academy Logo">
+    <h2>Poly Academy</h2>
+  </div>
+
+</header>
+<div class="header">
+  <h1>🤝 Mentor Connect</h1>
+  <p>College & Branch Wise Verified Mentors</p>
+</div>
+
+<div class="container">
+
+  <div class="filter-box">
+    <div class="filter-grid">
+      <input id="searchInput" placeholder="🔍 Search mentor">
+      <select id="collegeSelect"><option value="">🏫 Select College</option></select>
+      <select id="branchSelect"><option value="">🎓 Select Branch</option></select>
+    </div>
+    <div class="toggle">
+      <label><input type="checkbox" id="verifiedOnly"> Show only verified mentors</label>
+    </div>
+  </div>
+
+  <div id="mentorList"></div>
+
+  <p class="note">📌 Select mentor & submit rating honestly</p>
+</div>
+
+<!-- ================= FIREBASE ================= -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, increment } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* FIREBASE CONFIG */
+const firebaseConfig = {
+  apiKey: "AIzaSyA8H01tcT7TculXjhhHOhpGuQF-YhSqAnY",
+  authDomain: "hpresult-612a4.firebaseapp.com",
+  projectId: "hpresult-612a4",
+  messagingSenderId: "938318154272",
+  appId: "1:938318154272:web:f55d536591e673b03d8a45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* DOM */
+const collegeSelect=document.getElementById("collegeSelect");
+const branchSelect=document.getElementById("branchSelect");
+const mentorList=document.getElementById("mentorList");
+const searchInput=document.getElementById("searchInput");
+const verifiedOnly=document.getElementById("verifiedOnly");
+
+let mentors=[];
+
+/* STAR DISPLAY */
+function stars(r){
+  r=Math.round(r||0); let s="";
+  for(let i=1;i<=5;i++) s+=i<=r?"⭐":"☆";
+  return s;
+}
+
+/* LOAD DATA */
+onSnapshot(collection(db,"mentors"),snap=>{
+  mentors=[];
+  const colleges=new Set(), branches=new Set();
+  snap.forEach(d=>{
+    const m=d.data(); m.id=d.id;
+    mentors.push(m);
+    colleges.add(m.college);
+    branches.add(m.branch);
+  });
+  collegeSelect.innerHTML='<option value="">🏫 Select College</option>';
+  colleges.forEach(c=>collegeSelect.innerHTML+=`<option>${c}</option>`);
+  branchSelect.innerHTML='<option value="">🎓 Select Branch</option>';
+  branches.forEach(b=>branchSelect.innerHTML+=`<option>${b}</option>`);
+  render();
+});
+
+/* RENDER */
+function render(){
+  mentorList.innerHTML="";
+  let list=[...mentors];
+
+  if(collegeSelect.value) list=list.filter(m=>m.college===collegeSelect.value);
+  if(branchSelect.value) list=list.filter(m=>m.branch===branchSelect.value);
+  if(verifiedOnly.checked) list=list.filter(m=>m.verified===true);
+  if(searchInput.value) list=list.filter(m=>m.name.toLowerCase().includes(searchInput.value.toLowerCase()));
+
+  if(list.length===0){
+    mentorList.innerHTML='<div class="empty">No mentor found</div>';
+    return;
+  }
+
+function openChat(mentorWhatsapp, mentorName, mentorCollege, mentorBranch){
+  const message = `Hello ${mentorName}, I am seeking guidance regarding college and branch (${mentorCollege}, ${mentorBranch}). Could you please help me? Thank you.`;
+  const url = `https://wa.me/${mentorWhatsapp}?text=${encodeURIComponent(message)}`;
+  window.open(url,"_blank");
+}
+
+  list.forEach(m=>{
+    const avg = m.ratingCount ? (m.rating/m.ratingCount).toFixed(1) : "New";
+    mentorList.innerHTML+=`
+    <div class="mentor-card">
+      <div class="mentor-top">
+        <div class="avatar">${m.name.charAt(0)}</div>
+        <div class="mentor-info">
+          <h3>${m.name}${m.verified?'<span class="badge">✔ Verified</span>':""}</h3>
+          <small>${m.college} • ${m.branch}</small>
+          <div class="rating">${stars(avg)} <span>${avg}</span></div>
+        </div>
+      </div>
+
+    <a class="whatsapp-btn" target="_blank" 
+    href="https://wa.me/${m.whatsapp}?text=Hello%20Sir,%20I%20am%20seeking%20guidance%20regarding%20college%20and%20branch%20(${m.college},%20${m.branch}).%20Could%20you%20please%20help%20me?%20Thank%20you.">
+    💬 Chat on WhatsApp
+    </a>
+
+      <div class="rate-box" id="rate-${m.id}" data-star="">
+        Rate Mentor:
+        ${[1,2,3,4,5].map(i=>`
+          <span class="star" id="s-${m.id}-${i}"
+          onclick="selectStar('${m.id}',${i})">★</span>`).join("")}
+        <br>
+        <button class="rate-btn" onclick="submitRating('${m.id}')">Submit Rating</button>
+      </div>
+    </div>`;
+  });
+}
+
+/* EVENTS */
+[collegeSelect,branchSelect,verifiedOnly].forEach(e=>e.addEventListener("change",render));
+searchInput.addEventListener("keyup",render);
+
+/* GLOBAL FUNCTIONS */
+window.selectStar=(id,star)=>{
+  const box=document.getElementById("rate-"+id);
+  box.dataset.star=star;
+  for(let i=1;i<=5;i++){
+    document.getElementById(`s-${id}-${i}`).classList.toggle("active",i<=star);
+  }
+};
+
+window.submitRating=async(id)=>{
+  const box=document.getElementById("rate-"+id);
+  const star=Number(box.dataset.star);
+  if(!star){alert("Select stars");return;}
+
+  await addDoc(collection(db,"mentorRatings"),{
+    mentorId:id,stars:star,time:new Date()
+  });
+
+  await updateDoc(doc(db,"mentors",id),{
+    rating:increment(star),
+    ratingCount:increment(1)
+  });
+
+  alert("Thanks for rating ⭐");
+};
+</script>
+
+</body>
+</html>
